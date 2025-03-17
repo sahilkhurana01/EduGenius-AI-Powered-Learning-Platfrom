@@ -6,6 +6,7 @@ import TeacherDashboard from './Components/TeacherDashboard';
 import StudentDashboard from './Components/StudentDashboard';
 import SessionDebug from './Components/SessionDebug';
 import GeminiWrapper from './Components/Gemini/GeminiWrapper';
+import LandingPage from './Components/LandingPage/LandingPage';
 
 // Role-based Auth Guard component for protected routes
 const ProtectedRoute = ({ element, allowedRole }) => {
@@ -26,7 +27,7 @@ const ProtectedRoute = ({ element, allowedRole }) => {
       return <Navigate to="/student-dashboard" />;
     } else {
       // If role is invalid, redirect to role selection
-      return <Navigate to="/" />;
+      return <Navigate to="/role-selection" />;
     }
   }
   
@@ -38,7 +39,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<RoleSelectionPage />} />
+        {/* Default route is now the LandingPage */}
+        <Route path="/" element={<LandingPage />} />
+        
+        {/* Role selection is now a separate route */}
+        <Route path="/role-selection" element={<RoleSelectionPage />} />
+        
         <Route path="/login" element={<Login />} />
         <Route 
           path="/teacher-dashboard" 

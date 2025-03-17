@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, EyeOff, Lock, Mail, User, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 import { auth } from './Firebase'; // Make sure this path is correct
 import {
@@ -260,39 +261,59 @@ const AuthPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-            {/* Enhanced back button with increased spacing */}
-            <button 
-                onClick={handleGoBack}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                className="absolute top-4 sm:top-6 left-6 sm:left-8 flex items-center justify-center gap-1 sm:gap-2 
-                  py-2.5 sm:py-2 px-2.5 sm:px-4 
-                  rounded-full sm:rounded-md 
-                  shadow-md hover:shadow-lg 
-                  text-xs sm:text-sm font-medium 
-                  active:scale-95
-                  transition-all duration-300 ease-in-out 
-                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black
-                  dark:focus:ring-offset-gray-800
-                  z-10"
-                style={{
-                    backgroundColor: isHovered ? 'black' : 'white',
-                    color: isHovered ? 'white' : 'black',
-                    borderColor: 'black',
-                    borderWidth: '1px',
-                    transform: isHovered ? 'translateX(-5px)' : 'translateX(0)'
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4">
+            {/* Background animated shapes */}
+            <motion.div
+                className="absolute top-20 right-10 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+                animate={{
+                    x: [0, 30, 0],
+                    y: [0, 50, 0],
                 }}
+                transition={{
+                    duration: 8,
+                    repeat: Number.POSITIVE_INFINITY,
+                    repeatType: "reverse",
+                }}
+            />
+
+            <motion.div
+                className="absolute bottom-20 left-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+                animate={{
+                    x: [0, -30, 0],
+                    y: [0, 30, 0],
+                }}
+                transition={{
+                    duration: 10,
+                    repeat: Number.POSITIVE_INFINITY,
+                    repeatType: "reverse",
+                }}
+            />
+            
+            {/* Enhanced back button with increased spacing */}
+            <motion.button 
+                onClick={handleGoBack}
+                whileHover={{ scale: 1.05, x: -5 }}
+                whileTap={{ scale: 0.95 }}
+                className="absolute top-6 left-8 flex items-center justify-center gap-2 
+                  py-2 px-4 rounded-full
+                  bg-white shadow-md
+                  text-sm font-medium text-gray-700
+                  transition-all duration-300 z-10"
             >
-                <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <ArrowLeft className="h-4 w-4" />
                 <span className="hidden sm:inline">Back</span>
-            </button>
+            </motion.button>
             
             {/* Main container with responsive design and increased top margin */}
-            <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg overflow-hidden flex flex-col sm:flex-row relative min-h-[550px] sm:h-[550px] mt-16 sm:mt-12">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="w-full max-w-3xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col sm:flex-row relative min-h-[550px] sm:h-[550px] mt-16 sm:mt-12"
+            >
                 {/* Sliding information panel - mobile first approach with reversed animation */}
                 <div 
-                    className={`w-full sm:w-1/2 bg-black text-white p-6 sm:p-10 flex flex-col justify-center 
+                    className={`w-full sm:w-1/2 bg-gradient-to-b ${isLogin ? 'from-indigo-600 to-purple-700' : 'from-yellow-500 to-amber-600'} text-white p-6 sm:p-10 flex flex-col justify-center 
                           ${isLogin ? 'order-1 sm:order-none' : 'order-2 sm:order-none'}
                           ${isLogin ? '' : 'sm:absolute sm:h-full'}`} 
                     style={{ 
@@ -305,22 +326,24 @@ const AuthPage = () => {
                         <h2 className="text-xl sm:text-2xl font-bold mb-2">
                             {isLogin ? 'Welcome Back!' : 'Join EduGenius'}
                         </h2>
-                        <p className="text-gray-300 text-xs sm:text-sm">
+                        <p className="text-gray-200 text-xs sm:text-sm">
                             {isLogin
                                 ? 'Sign in to access your account and continue your learning journey.'
                                 : 'Create an account to start your educational journey with us.'}
                         </p>
                     </div>
 
-                    <button 
+                    <motion.button 
                         onClick={toggleAuthMode}
                         disabled={animating}
-                        className={`mt-4 sm:mt-6 py-1.5 sm:py-2 px-3 sm:px-4 border border-white rounded-md text-xs sm:text-sm font-medium 
-                            transition-colors duration-200 hover:bg-white hover:text-black
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`mt-4 sm:mt-6 py-2 px-6 border border-white rounded-full text-sm font-medium 
+                            transition-all duration-200 hover:bg-white hover:text-gray-800
                             ${animating ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isLogin ? 'Sign Up' : 'Sign In'}
-                    </button>
+                    </motion.button>
                 </div>
 
                 {/* Form containers - responsive layouts for both forms with reversed animation */}
@@ -336,62 +359,62 @@ const AuthPage = () => {
                         transition: 'all 0.7s cubic-bezier(0.645, 0.045, 0.355, 1.000)',
                         zIndex: isLogin ? 0 : 5
                     }}>
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Create Account</h2>
-                    {error && !isLogin && <p className="text-red-500 text-xs sm:text-sm mb-3 sm:mb-4">{error}</p>}
-                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-amber-600 bg-clip-text text-transparent mb-6">Create Account</h2>
+                    {error && !isLogin && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Name input */}
                         <div>
-                            <label htmlFor="signup-name" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                            <label htmlFor="signup-name" className="block text-sm font-medium text-gray-700 mb-1">
                                 Full Name
                             </label>
                             <div className="relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                                    <User className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input id="signup-name" name="name" type="text" required value={signupData.name}
                                     onChange={handleSignupChange}
-                                    className="focus:ring-black focus:border-black block w-full pl-9 sm:pl-10 py-1.5 sm:py-2 text-sm border border-gray-300 rounded-md"
+                                    className="focus:ring-amber-500 focus:border-amber-500 block w-full pl-10 py-2 text-sm border border-gray-300 rounded-md"
                                     placeholder="John Doe" />
                             </div>
                         </div>
 
                         {/* Email input */}
                         <div>
-                            <label htmlFor="signup-email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                            <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 mb-1">
                                 Email Address
                             </label>
                             <div className="relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                                    <Mail className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input id="signup-email" name="email" type="email" required value={signupData.email}
                                     onChange={handleSignupChange}
-                                    className="focus:ring-black focus:border-black block w-full pl-9 sm:pl-10 py-1.5 sm:py-2 text-sm border border-gray-300 rounded-md"
+                                    className="focus:ring-amber-500 focus:border-amber-500 block w-full pl-10 py-2 text-sm border border-gray-300 rounded-md"
                                     placeholder="you@example.com" />
                             </div>
                         </div>
 
                         {/* Password input */}
                         <div>
-                            <label htmlFor="signup-password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                            <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 mb-1">
                                 Password
                             </label>
                             <div className="relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                                    <Lock className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input id="signup-password" name="password" type={showPassword ? "text" : "password"} required
                                     value={signupData.password} onChange={handleSignupChange}
-                                    className="focus:ring-black focus:border-black block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-1.5 sm:py-2 text-sm border border-gray-300 rounded-md"
+                                    className="focus:ring-amber-500 focus:border-amber-500 block w-full pl-10 pr-10 py-2 text-sm border border-gray-300 rounded-md"
                                     placeholder="••••••••" />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                                     <button type="button" onClick={() => setShowPassword(!showPassword)}
                                         className="text-gray-400 hover:text-gray-500"
                                     >
                                         {showPassword ? (
-                                            <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
+                                            <EyeOff className="h-5 w-5" />
                                         ) : (
-                                            <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
+                                            <Eye className="h-5 w-5" />
                                         )}
                                     </button>
                                 </div>
@@ -400,11 +423,13 @@ const AuthPage = () => {
 
                         {/* Button */}
                         <div>
-                            <button type="submit"
-                                className="w-full flex justify-center py-1.5 sm:py-2 px-3 sm:px-4 border border-transparent rounded-md shadow-sm text-xs sm:text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                            <motion.button type="submit"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-full shadow-md text-sm font-medium text-white bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 focus:outline-none"
                                 disabled={loading}>
                                 {loading ? 'Processing...' : 'Sign Up'}
-                            </button>
+                            </motion.button>
                         </div>
 
                         {/* Divider */}
@@ -412,17 +437,19 @@ const AuthPage = () => {
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-gray-300"></div>
                             </div>
-                            <div className="relative flex justify-center text-xs sm:text-sm">
+                            <div className="relative flex justify-center text-sm">
                                 <span className="px-2 bg-white text-gray-500">Or continue with</span>
                             </div>
                         </div>
 
                         {/* Google button */}
                         <div>
-                            <button type="button" onClick={googleLogin}
-                                className="w-full flex justify-center items-center gap-1 sm:gap-2 py-1.5 sm:py-2 px-3 sm:px-4 border border-gray-300 rounded-md shadow-sm text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                            <motion.button type="button" onClick={googleLogin}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full flex justify-center items-center gap-2 py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
                                 disabled={loading}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" className="sm:w-[20px] sm:h-[20px]">
+                                <svg width="20" height="20" viewBox="0 0 24 24">
                                     <path
                                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                                         fill="#4285F4" />
@@ -437,7 +464,7 @@ const AuthPage = () => {
                                         fill="#EA4335" />
                                 </svg>
                                 Sign in with Google
-                            </button>
+                            </motion.button>
                         </div>
                     </form>
                 </div>
@@ -455,76 +482,67 @@ const AuthPage = () => {
                         transition: 'all 0.7s cubic-bezier(0.645, 0.045, 0.355, 1.000)',
                         zIndex: isLogin ? 5 : 0
                     }}>
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Sign In</h2>
-                    {error && isLogin && <p className="text-red-500 text-xs sm:text-sm mb-3 sm:mb-4">{error}</p>}
-                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6">Sign In</h2>
+                    {error && isLogin && <p className="text-red-500 text-sm mb-4">{error}</p>}
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Email input */}
                         <div>
-                            <label htmlFor="login-email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                            <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">
                                 Email Address
                             </label>
                             <div className="relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                                    <Mail className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input id="login-email" name="email" type="email" required value={loginData.email}
                                     onChange={handleLoginChange}
-                                    className="focus:ring-black focus:border-black block w-full pl-9 sm:pl-10 py-1.5 sm:py-2 text-sm border border-gray-300 rounded-md"
+                                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 py-2 text-sm border border-gray-300 rounded-md"
                                     placeholder="you@example.com" />
                             </div>
                         </div>
 
                         {/* Password input */}
                         <div>
-                            <label htmlFor="login-password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                            <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1">
                                 Password
                             </label>
                             <div className="relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+                                    <Lock className="h-5 w-5 text-gray-400" />
                                 </div>
                                 <input id="login-password" name="password" type={showPassword ? "text" : "password"} required
                                     value={loginData.password} onChange={handleLoginChange}
-                                    className="focus:ring-black focus:border-black block w-full pl-9 sm:pl-10 pr-9 sm:pr-10 py-1.5 sm:py-2 text-sm border border-gray-300 rounded-md"
+                                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 pr-10 py-2 text-sm border border-gray-300 rounded-md"
                                     placeholder="••••••••" />
                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                                     <button type="button" onClick={() => setShowPassword(!showPassword)}
                                         className="text-gray-400 hover:text-gray-500"
                                     >
                                         {showPassword ? (
-                                            <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" />
+                                            <EyeOff className="h-5 w-5" />
                                         ) : (
-                                            <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
+                                            <Eye className="h-5 w-5" />
                                         )}
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Remember me & Forgot password */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                                <input id="remember-me" name="remember-me" type="checkbox"
-                                    className="h-3 w-3 sm:h-4 sm:w-4 text-black focus:ring-black border-gray-300 rounded" />
-                                <label htmlFor="remember-me" className="ml-2 block text-xs sm:text-sm text-gray-700">
-                                    Remember me
-                                </label>
-                            </div>
-
-                            <div className="text-xs sm:text-sm">
-                                <a href="#" className="font-medium text-black hover:text-gray-700">
-                                    Forgot password?
-                                </a>
-                            </div>
+                        <div className="text-right">
+                            <a href="#" className="text-sm text-indigo-600 hover:text-indigo-800">
+                                Forgot password?
+                            </a>
                         </div>
 
                         {/* Button */}
                         <div>
-                            <button type="submit"
-                                className="w-full flex justify-center py-1.5 sm:py-2 px-3 sm:px-4 border border-transparent rounded-md shadow-sm text-xs sm:text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                            <motion.button type="submit"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-full shadow-md text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none"
                                 disabled={loading}>
                                 {loading ? 'Processing...' : 'Sign In'}
-                            </button>
+                            </motion.button>
                         </div>
 
                         {/* Divider */}
@@ -532,17 +550,21 @@ const AuthPage = () => {
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-gray-300"></div>
                             </div>
-                            <div className="relative flex justify-center text-xs sm:text-sm">
+                            <div className="relative flex justify-center text-sm">
                                 <span className="px-2 bg-white text-gray-500">Or continue with</span>
                             </div>
                         </div>
 
                         {/* Google button */}
                         <div>
-                            <button type="button" onClick={googleLogin}
-                                className="w-full flex justify-center items-center gap-1 sm:gap-2 py-1.5 sm:py-2 px-3 sm:px-4 border border-gray-300 rounded-md shadow-sm text-xs sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
+                            <motion.button 
+                                type="button" 
+                                onClick={googleLogin}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full flex justify-center items-center gap-2 py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
                                 disabled={loading}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" className="sm:w-[20px] sm:h-[20px]">
+                                <svg width="20" height="20" viewBox="0 0 24 24">
                                     <path
                                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                                         fill="#4285F4" />
@@ -557,11 +579,11 @@ const AuthPage = () => {
                                         fill="#EA4335" />
                                 </svg>
                                 Sign in with Google
-                            </button>
+                            </motion.button>
                         </div>
                     </form>
                 </div>
-            </div>
+            </motion.div>
         </div>
     );
 };
