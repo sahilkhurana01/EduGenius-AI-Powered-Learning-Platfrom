@@ -134,19 +134,32 @@ const TeacherDashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+    <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       {/* Sidebar */}
       <div className={`bg-white shadow-md ${sidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 fixed h-full z-10`}>
         <div className="p-4 flex flex-col h-full">
           <div className="flex items-center justify-between mb-8">
             {sidebarOpen ? (
-              <img src="/edugenius logo.png" alt="EduGenius Logo" className="h-8" />
+              <a href="#" className="flex items-center group">
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur opacity-30 group-hover:opacity-100 transition duration-300"></div>
+                  <div className="relative bg-white rounded-full p-1">
+                    <svg className="h-7 w-7 text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    </svg>
+                  </div>
+                </div>
+                <span className="ml-3 text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                  EduGenius
+                </span>
+              </a>
             ) : (
-              <div className="w-8 h-8 mx-auto bg-blue-600 rounded-md flex items-center justify-center text-white font-bold">
+              <div className="w-8 h-8 mx-auto bg-gradient-to-r from-indigo-600 to-purple-600 rounded-md flex items-center justify-center text-white font-bold">
                 E
               </div>
             )}
-            <button onClick={toggleSidebar} className="text-gray-500 hover:text-gray-700">
+            <button onClick={toggleSidebar} className="text-gray-500 hover:text-indigo-600">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={sidebarOpen ? "M15 19l-7-7 7-7" : "M9 5l7 7-7 7"}></path>
               </svg>
@@ -171,7 +184,7 @@ const TeacherDashboard = () => {
           <div className="mt-auto">
             <div className={`border-t pt-4 ${sidebarOpen ? '' : 'flex justify-center'}`}>
               <button 
-                className={`flex items-center ${sidebarOpen ? 'text-red-600 space-x-2' : 'justify-center text-red-600'} hover:text-red-800`}
+                className={`flex items-center ${sidebarOpen ? 'text-yellow-500 space-x-2' : 'justify-center text-yellow-500'} hover:text-yellow-600`}
                 onClick={() => {
                   sessionStorage.removeItem('isAuthenticated');
                   sessionStorage.removeItem('userRole');
@@ -198,134 +211,81 @@ const TeacherDashboard = () => {
         <header className="bg-white shadow-sm h-16 flex items-center px-6">
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
-            <button className="text-gray-600 hover:text-gray-900 relative transition-colors duration-150">
+            <button className="text-indigo-600 hover:text-indigo-800 relative transition-colors duration-150">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
               </svg>
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">3</span>
+              <span className="absolute -top-1 -right-1 bg-yellow-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">3</span>
             </button>
-            <div className="flex items-center space-x-2 cursor-pointer group relative">
-              <div className="h-8 w-8 rounded-full overflow-hidden border-2 border-transparent group-hover:border-blue-500 transition-all duration-200 relative">
-                {profilePictureLoading ? (
-                  <div className="h-full w-full flex items-center justify-center bg-gray-200">
-                    <svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  </div>
-                ) : (
-                  <img 
-                    src={userData.photoURL || 'https://randomuser.me/api/portraits/women/45.jpg'} 
-                    alt="Profile" 
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      // Fallback to default image if the profile picture fails to load
-                      console.error('Profile image failed to load, falling back to default', userData.photoURL);
-                      e.target.src = 'https://randomuser.me/api/portraits/women/45.jpg';
-                    }}
-                  />
-                )}
+            
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-full overflow-hidden">
+                <img 
+                  src={userData.photoURL} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "https://ui-avatars.com/api/?name=" + userData.name.replace(/ /g, '+');
+                  }}
+                />
               </div>
-              <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors duration-200">{userData.name}</span>
-              
-              {/* User dropdown (hidden by default) */}
-              <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-md shadow-lg overflow-hidden z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">{userData.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{userData.email}</p>
-                </div>
-                <div className="py-1">
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">Profile Settings</a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">Preferences</a>
-                </div>
-              </div>
+              <span className="font-medium text-indigo-800">{userData.name}</span>
             </div>
           </div>
         </header>
-
-        {/* Page Content */}
+        
+        {/* Content */}
         <main className="p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-gray-800">Teacher Dashboard</h1>
-            <p className="text-gray-500">Welcome back, {userData.name}. Here's what's happening with your classes today.</p>
-          </div>
-
-          {/* Dashboard View */}
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
+              <h1 className="text-2xl font-bold text-indigo-900">Teacher Dashboard</h1>
               <StatCards stats={dashboardStats} />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <StudentProgress />
-                <RecentActivity />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Weekly Activity</h2>
+                  <WeeklyActivity />
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Recent Activity</h2>
+                  <RecentActivity />
+                </div>
               </div>
-              <WeeklyActivity />
-              <ResourceLibrary />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Student Progress</h2>
+                  <StudentProgress />
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
+                  <ResourceLibrary />
+                </div>
+              </div>
             </div>
           )}
-
-          {/* Students Tab */}
-          {activeTab === 'students' && (
-            <div className="transition-opacity duration-300">
-              <StudentsTab />
-            </div>
-          )}
-
-          {/* Lessons Tab */}
-          {activeTab === 'lessons' && (
-            <div className="transition-opacity duration-300">
-              <LessonsTab />
-            </div>
-          )}
-
-          {/* Resources Tab */}
-          {activeTab === 'resources' && (
-            <div className="transition-opacity duration-300">
-              <ResourceLibrary />
-            </div>
-          )}
-
-          {/* Calendar Tab */}
-          {activeTab === 'calendar' && (
-            <div className="transition-opacity duration-300">
-              <CalendarTab />
-            </div>
-          )}
-
-          {/* Messages Tab */}
-          {activeTab === 'messages' && (
-            <div className="transition-opacity duration-300">
-              <MessagesTab />
-            </div>
-          )}
-
-          {/* Course Settings Tab */}
-          {activeTab === 'settings' && (
-            <div className="transition-opacity duration-300">
-              <CourseSettings />
-            </div>
-          )}
-
-          {/* Help & Support Tab */}
-          {activeTab === 'help' && (
-            <div className="transition-opacity duration-300">
-              <HelpSupport />
-            </div>
-          )}
+          
+          {activeTab === 'students' && <StudentsTab />}
+          {activeTab === 'lessons' && <LessonsTab />}
+          {activeTab === 'resources' && <ResourceLibrary />}
+          {activeTab === 'calendar' && <CalendarTab />}
+          {activeTab === 'messages' && <MessagesTab />}
+          {activeTab === 'settings' && <CourseSettings />}
+          {activeTab === 'help' && <HelpSupport />}
         </main>
       </div>
     </div>
   );
 };
 
-// Navigation Item Component
+// NavItem Component
 const NavItem = ({ icon, label, active, collapsed, onClick }) => {
-  // Return the appropriate icon based on the label
+  
   const getIcon = (iconName) => {
     switch (iconName) {
       case 'dashboard':
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
           </svg>
         );
       case 'students':
@@ -340,22 +300,28 @@ const NavItem = ({ icon, label, active, collapsed, onClick }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
           </svg>
         );
-      case 'resources':
-        return (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-          </svg>
-        );
       case 'calendar':
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
           </svg>
         );
+      case 'resources':
+        return (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        );
       case 'messages':
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+          </svg>
+        );
+      case 'ai':
+        return (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
           </svg>
         );
       case 'settings':
@@ -371,25 +337,24 @@ const NavItem = ({ icon, label, active, collapsed, onClick }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         );
-      case 'ai':
-        return (
-          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 3.104c-.48.105-.96.308-1.381.609-2.324 1.659-2.35 4.866-.053 6.556.735.541 1.096 1.408.947 2.398a12.538 12.538 0 01-.71 2.7c-.2.476.12.98.612 1.066s.92-.238 1.054-.709c.303-1.058.536-2.15.7-3.264.156-.993.78-1.747 1.579-2.047.797-.3 1.656-.127 2.338.53 1.401 1.353 3.6 1.353 5.002 0 1.622-1.567 1.622-4.107 0-5.674-.705-.681-1.612-.882-2.45-.666-.84.216-1.566.806-1.968 1.733a12.366 12.366 0 00-.937 4.382c-.043.84-.797 1.439-1.633 1.294-.836-.144-1.391-.965-1.095-1.785.346-.958.63-1.943.84-2.946.16-.744-.1-1.456-.689-1.912-2.297-1.79-2.266-5.077.064-6.829C15 .5 18 1 18 1"></path>
-          </svg>
-        );
       default:
         return null;
     }
   };
-
+  
   return (
     <button
       onClick={onClick}
-      className={`flex items-center ${collapsed ? 'justify-center' : 'space-x-2'} px-3 py-2 rounded-lg transition-all duration-200 w-full
-        ${active ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'}`}
+      className={`flex items-center w-full p-2 rounded-lg transition-colors duration-150 ${
+        active 
+          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' 
+          : 'text-gray-600 hover:text-indigo-600 hover:bg-indigo-50'
+      } ${collapsed ? 'justify-center' : ''}`}
     >
-      {getIcon(icon)}
-      {!collapsed && <span>{label}</span>}
+      <div className={active ? 'text-white' : 'text-gray-500'}>
+        {getIcon(icon)}
+      </div>
+      {!collapsed && <span className={`ml-3 ${active ? 'font-medium' : ''}`}>{label}</span>}
     </button>
   );
 };

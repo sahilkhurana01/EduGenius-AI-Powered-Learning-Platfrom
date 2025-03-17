@@ -77,7 +77,7 @@ const RoleSelectionPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                         whileHover={{ scale: 1.03 }}
-                        className="bg-white p-8 md:p-10 rounded-2xl shadow-lg w-full md:w-1/2 cursor-pointer transition-all duration-300 relative overflow-hidden"
+                        className="bg-white p-8 md:p-16 rounded-2xl shadow-lg w-full md:w-1/2 cursor-pointer transition-all duration-300 relative overflow-hidden"
                         onMouseEnter={() => setHoveredRole('teacher')}
                         onMouseLeave={() => setHoveredRole(null)}
                         onClick={() => handleRoleSelect('teacher')}
@@ -130,7 +130,7 @@ const RoleSelectionPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.3 }}
                         whileHover={{ scale: 1.03 }}
-                        className="bg-white p-8 md:p-10 rounded-2xl shadow-lg w-full md:w-1/2 cursor-pointer transition-all duration-300 relative overflow-hidden"
+                        className="bg-white p-8 md:p-16 rounded-2xl shadow-lg w-full md:w-1/2 cursor-pointer transition-all duration-300 relative overflow-hidden"
                         onMouseEnter={() => setHoveredRole('student')}
                         onMouseLeave={() => setHoveredRole(null)}
                         onClick={() => handleRoleSelect('student')}
