@@ -14,10 +14,10 @@ const CourseCard = ({ title, instructor, level, duration, image, rating, student
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      viewport={{ once: true }}
-      whileHover={{ y: -5 }}
-      className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all"
+      transition={{ duration: 0.7, delay, ease: "easeOut" }}
+      viewport={{ once: true, margin: "-50px" }}
+      whileHover={{ y: -5, transition: { duration: 0.3, ease: "easeOut" }, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+      className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 ease-in-out"
     >
       <div className="relative">
         <img src={image || "/placeholder.svg"} alt={title} className="w-full h-48 object-cover" />
@@ -45,7 +45,7 @@ const CourseCard = ({ title, instructor, level, duration, image, rating, student
           <span>{students.toLocaleString()} students enrolled</span>
         </div>
 
-        <button className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white py-2 rounded-lg font-medium transition-colors">
+        <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-2 rounded-lg font-medium transition-all duration-300 ease-in-out">
           Enroll Now
         </button>
       </div>

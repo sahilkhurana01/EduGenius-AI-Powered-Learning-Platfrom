@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { GraduationCap, Menu, X, ChevronDown } from "lucide-react"
+import { Link, useNavigate } from "react-router-dom"
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,6 +32,11 @@ const Navbar = () => {
     } else {
       setActiveDropdown(dropdown)
     }
+  }
+
+  const handleNavigation = (path) => {
+    navigate(path)
+    setIsMenuOpen(false)
   }
 
   return (
@@ -175,15 +182,18 @@ const Navbar = () => {
             </a>
 
             <div className="ml-4 flex items-center space-x-3">
-              <a href="#" className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+              <button 
+                onClick={() => handleNavigation('/role-selection')}
+                className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+              >
                 Log In
-              </a>
-              <a
-                href="#"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-5 py-2 rounded-full font-medium transition-colors shadow-md hover:shadow-lg"
+              </button>
+              <button
+                onClick={() => handleNavigation('/role-selection')}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-5 py-2 rounded-full font-medium transition-all duration-300 ease-in-out shadow-md hover:shadow-lg"
               >
                 Sign Up Free
-              </a>
+              </button>
             </div>
           </div>
 
@@ -304,18 +314,18 @@ const Navbar = () => {
               </a>
 
               <div className="pt-4 pb-3 border-t border-gray-200">
-                <a
-                  href="#"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:text-indigo-800"
+                <button
+                  onClick={() => handleNavigation('/role-selection')}
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:text-indigo-800"
                 >
                   Log In
-                </a>
-                <a
-                  href="#"
-                  className="block px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 text-center mt-2"
+                </button>
+                <button
+                  onClick={() => handleNavigation('/role-selection')}
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 text-center mt-2"
                 >
                   Sign Up Free
-                </a>
+                </button>
               </div>
             </div>
           </motion.div>
