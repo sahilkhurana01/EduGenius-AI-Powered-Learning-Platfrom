@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchResources, getResourceCategories, uploadResource, incrementDownloadCount } from '../../utils/supabaseClient';
+import PdfViewer from './PdfViewer';
 
 const ResourceLibrary = ({ userRole = 'student' }) => {
   const [resources, setResources] = useState([]);
@@ -17,6 +18,10 @@ const ResourceLibrary = ({ userRole = 'student' }) => {
     category: '',
     author: ''
   });
+  
+  // PDF viewer state
+  const [viewingPdf, setViewingPdf] = useState(false);
+  const [selectedResource, setSelectedResource] = useState(null);
 
   useEffect(() => {
     loadResourcesAndCategories();
@@ -170,6 +175,22 @@ const ResourceLibrary = ({ userRole = 'student' }) => {
     }
   };
 
+  const handleViewFile = (resource) => {
+    // Only handle PDF files in the viewer
+    if (resource.type === 'PDF') {
+      setSelectedResource(resource);
+      setViewingPdf(true);
+    } else {
+      // For non-PDF files, just open in a new tab
+      window.open(resource.url, '_blank');
+    }
+  };
+
+  const handleClosePdfViewer = () => {
+    setViewingPdf(false);
+    setSelectedResource(null);
+  };
+
   const handleDownload = async (resource) => {
     try {
       // Increment download count in the background
@@ -177,10 +198,7 @@ const ResourceLibrary = ({ userRole = 'student' }) => {
       
       // Ask for confirmation before downloading
       if (confirm(`Do you want to download "${resource.title}"?`)) {
-        // Open the file in a new tab for viewing
-        window.open(resource.url, '_blank');
-        
-        // Trigger browser's download dialog
+        // Create a temporary link to trigger the download dialog
         const link = document.createElement('a');
         link.href = resource.url;
         link.download = resource.name; // This forces download instead of navigation
@@ -220,6 +238,15 @@ const ResourceLibrary = ({ userRole = 'student' }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {/* PDF Viewer Modal */}
+      {viewingPdf && selectedResource && (
+        <PdfViewer 
+          pdfUrl={selectedResource.url} 
+          fileName={selectedResource.title} 
+          onClose={handleClosePdfViewer} 
+        />
+      )}
+      
       {/* Configuration warning banner - show only when using mock data */}
       {error && error.includes('Failed to load resources') && (
         <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4">
@@ -299,9 +326,9 @@ const ResourceLibrary = ({ userRole = 'student' }) => {
             ) : error ? (
               <div className="text-red-500 text-sm">{error}</div>
             ) : (
-              <ul className="space-y-1">
-                {categories.map((category) => (
-                  <li key={category.name}>
+            <ul className="space-y-1">
+              {categories.map((category) => (
+                <li key={category.name}>
                     <button 
                       className={`flex justify-between items-center w-full px-2 py-1.5 text-left rounded-md hover:bg-gray-100 text-sm transition-colors ${
                         selectedCategory === category.name ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
@@ -309,11 +336,11 @@ const ResourceLibrary = ({ userRole = 'student' }) => {
                       onClick={() => handleCategoryClick(category.name)}
                     >
                       <span>{category.name}</span>
-                      <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full text-gray-500">{category.count}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+                    <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full text-gray-500">{category.count}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
             )}
           </div>
           
@@ -344,52 +371,60 @@ const ResourceLibrary = ({ userRole = 'student' }) => {
               )}
             </div>
           ) : (
-            <div className="h-[350px] overflow-y-auto pr-2">
-              <table className="min-w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resource</th>
-                    <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Category</th>
-                    <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Downloads</th>
-                    <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added</th>
+          <div className="h-[350px] overflow-y-auto pr-2">
+            <table className="min-w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Resource</th>
+                  <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Category</th>
+                  <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Downloads</th>
+                  <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Added</th>
                     <th className="py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
                   {filteredResources.map((resource) => (
                     <tr key={resource.id} className="hover:bg-gray-50">
-                      <td className="py-3 flex items-center">
-                        <span className={`
-                          h-8 w-8 rounded-md flex items-center justify-center font-semibold text-xs text-white
-                          ${resource.type === 'PDF' ? 'bg-red-500' : 
-                            resource.type === 'PPT' ? 'bg-orange-500' : 
+                    <td className="py-3 flex items-center">
+                      <span className={`
+                        h-8 w-8 rounded-md flex items-center justify-center font-semibold text-xs text-white
+                        ${resource.type === 'PDF' ? 'bg-red-500' : 
+                          resource.type === 'PPT' ? 'bg-orange-500' : 
                             resource.type === 'DOC' ? 'bg-blue-500' : 
                             resource.type === 'XLS' ? 'bg-green-500' : 
                             resource.type === 'Image' ? 'bg-purple-500' : 'bg-gray-500'}
-                        `}>
-                          {resource.type}
-                        </span>
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-gray-800">{resource.title}</p>
+                      `}>
+                        {resource.type}
+                      </span>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-800">{resource.title}</p>
                           <p className="text-xs text-gray-500">{formatFileSize(resource.size)}</p>
-                        </div>
-                      </td>
-                      <td className="py-3 text-sm text-gray-600 hidden md:table-cell">{resource.category}</td>
-                      <td className="py-3 text-sm text-gray-600 hidden md:table-cell">{resource.downloads}</td>
-                      <td className="py-3 text-sm text-gray-600">{resource.date}</td>
-                      <td className="py-3 text-sm">
+                      </div>
+                    </td>
+                    <td className="py-3 text-sm text-gray-600 hidden md:table-cell">{resource.category}</td>
+                    <td className="py-3 text-sm text-gray-600 hidden md:table-cell">{resource.downloads}</td>
+                    <td className="py-3 text-sm text-gray-600">{resource.date}</td>
+                      <td className="py-3 text-sm flex space-x-3">
+                        {resource.type === 'PDF' && (
+                          <button 
+                            className="text-blue-600 hover:text-blue-800"
+                            onClick={() => handleViewFile(resource)}
+                          >
+                            View
+                          </button>
+                        )}
                         <button 
-                          className="text-blue-600 hover:text-blue-800 mr-3"
+                          className="text-blue-600 hover:text-blue-800"
                           onClick={() => handleDownload(resource)}
                         >
                           Download
                         </button>
                       </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           )}
         </div>
       </div>
@@ -476,5 +511,5 @@ const ResourceLibrary = ({ userRole = 'student' }) => {
   );
 };
 
-export default ResourceLibrary;
+export default ResourceLibrary; 
 
