@@ -264,7 +264,7 @@ const AuthPage = () => {
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4">
             {/* Background animated shapes */}
             <motion.div
-                className="absolute top-20 right-10 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+                className="absolute top-20 right-10 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-60"
                 animate={{
                     x: [0, 30, 0],
                     y: [0, 50, 0],
@@ -273,11 +273,12 @@ const AuthPage = () => {
                     duration: 8,
                     repeat: Number.POSITIVE_INFINITY,
                     repeatType: "reverse",
+                    ease: "easeInOut"
                 }}
             />
 
             <motion.div
-                className="absolute bottom-20 left-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+                className="absolute bottom-20 left-10 w-72 h-72 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-60"
                 animate={{
                     x: [0, -30, 0],
                     y: [0, 30, 0],
@@ -286,6 +287,7 @@ const AuthPage = () => {
                     duration: 10,
                     repeat: Number.POSITIVE_INFINITY,
                     repeatType: "reverse",
+                    ease: "easeInOut"
                 }}
             />
             
@@ -313,7 +315,7 @@ const AuthPage = () => {
             >
                 {/* Sliding information panel - mobile first approach with reversed animation */}
                 <div 
-                    className={`w-full sm:w-1/2 bg-gradient-to-b ${isLogin ? 'from-indigo-600 to-purple-700' : 'from-yellow-500 to-amber-600'} text-white p-6 sm:p-10 flex flex-col justify-center 
+                    className={`w-full sm:w-1/2 bg-gradient-to-b ${isLogin ? 'from-indigo-500 to-purple-600' : 'from-yellow-400 to-amber-500'} text-white p-6 sm:p-10 flex flex-col justify-center 
                           ${isLogin ? 'order-1 sm:order-none' : 'order-2 sm:order-none'}
                           ${isLogin ? '' : 'sm:absolute sm:h-full'}`} 
                     style={{ 

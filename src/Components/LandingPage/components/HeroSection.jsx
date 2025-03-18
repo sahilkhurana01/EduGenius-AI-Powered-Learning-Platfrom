@@ -118,16 +118,16 @@ const HeroSection = () => {
                 onClick={handleStartLearning}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-8 rounded-full inline-flex items-center transition-all shadow-lg"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-8 rounded-full inline-flex items-center transition-all shadow-lg duration-300 ease-in-out"
               >
                 Start Learning
                 <ArrowRight className="ml-2" size={18} />
               </motion.button>
               <motion.button
-                onClick={handleExploreFeatures}
+                onClick={handleStartLearning}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-white hover:bg-gray-100 border-2 border-indigo-600 text-indigo-600 font-medium py-3 px-8 rounded-full transition-all"
+                className="bg-white hover:bg-gray-100 border-2 border-indigo-600 text-indigo-600 font-medium py-3 px-8 rounded-full transition-all duration-300 ease-in-out"
               >
                 Explore Features
               </motion.button>
@@ -141,12 +141,12 @@ const HeroSection = () => {
             className="relative"
           >
             <div className="relative z-10">
-              <div className="relative">
+              <div className="relative mx-auto max-w-md">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-30"></div>
                 <img
-                  src="/placeholder.svg?height=500&width=600"
-                  alt="Students learning with EduGenius"
-                  className="relative rounded-2xl shadow-xl"
+                  src="/kid.jpg"
+                  alt="Teenagers learning with EduGenius AI platform"
+                  className="relative rounded-2xl shadow-xl object-cover h-[380px] w-[600px]"
                 />
               </div>
             </div>
@@ -160,7 +160,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.8 }}
-              className="absolute top-10 -left-10 bg-white p-3 rounded-lg shadow-lg flex items-center"
+              className="absolute top-10 -left-5 z-20 bg-white p-3 rounded-lg shadow-lg flex items-center"
             >
               <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}>
                 <div className="bg-gradient-to-r from-yellow-400 to-amber-500 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold mr-2">
@@ -174,7 +174,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1 }}
-              className="absolute bottom-10 -right-5 bg-white p-3 rounded-lg shadow-lg flex items-center"
+              className="absolute bottom-10 right-110 z-20 bg-white p-3 rounded-lg shadow-lg flex items-center"
             >
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
@@ -191,7 +191,7 @@ const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 1.2 }}
-              className="absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2 bg-white p-3 rounded-lg shadow-lg flex items-center"
+              className="absolute top-1/2 right-0 transform translate-x-1/4 -translate-y-1/2 z-20 bg-white p-3 rounded-lg shadow-lg flex items-center"
             >
               <motion.div
                 animate={{ rotate: [0, 10, 0, -10, 0] }}

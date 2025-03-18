@@ -85,7 +85,7 @@ const LandingPage = () => {
       title: "Math Quest",
       category: "Mathematics",
       level: "Intermediate",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "https://images.unsplash.com/photo-1518133910546-b6c2fb7d79e3?q=80&w=800&h=500&auto=format&fit=crop",
       players: 2345,
       rating: 4.8,
     },
@@ -93,7 +93,7 @@ const LandingPage = () => {
       title: "Science Explorer",
       category: "Science",
       level: "Beginner",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?q=80&w=800&h=500&auto=format&fit=crop",
       players: 1987,
       rating: 4.7,
     },
@@ -101,7 +101,7 @@ const LandingPage = () => {
       title: "History Adventure",
       category: "History",
       level: "Advanced",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?q=80&w=800&h=500&auto=format&fit=crop",
       players: 1456,
       rating: 4.9,
     },
@@ -113,7 +113,7 @@ const LandingPage = () => {
       instructor: "Prof. Sarah Johnson",
       level: "Beginner",
       duration: "8 weeks",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&h=500&auto=format&fit=crop",
       rating: 4.8,
       students: 1245,
     },
@@ -122,7 +122,7 @@ const LandingPage = () => {
       instructor: "Dr. Michael Chen",
       level: "Advanced",
       duration: "12 weeks",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?q=80&w=800&h=500&auto=format&fit=crop",
       rating: 4.9,
       students: 876,
     },
@@ -131,7 +131,7 @@ const LandingPage = () => {
       instructor: "Emma Williams",
       level: "Intermediate",
       duration: "6 weeks",
-      image: "/placeholder.svg?height=200&width=300",
+      image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=800&h=500&auto=format&fit=crop",
       rating: 4.7,
       students: 1532,
     },
@@ -141,7 +141,7 @@ const LandingPage = () => {
     {
       name: "Alex Johnson",
       role: "High School Student",
-      image: "/placeholder.svg?height=80&width=80",
+      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=150&h=150&auto=format&fit=crop&crop=faces",
       content:
         "EduGenius transformed how I study. The gamification makes learning actually fun, and I've improved my grades significantly!",
       rating: 5,
@@ -149,7 +149,7 @@ const LandingPage = () => {
     {
       name: "Priya Sharma",
       role: "College Freshman",
-      image: "/placeholder.svg?height=80&width=80",
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=150&h=150&auto=format&fit=crop&crop=faces",
       content:
         "The personalized learning paths helped me catch up on subjects I was struggling with. The achievement system keeps me motivated!",
       rating: 5,
@@ -157,7 +157,7 @@ const LandingPage = () => {
     {
       name: "Marcus Chen",
       role: "Middle School Student",
-      image: "/placeholder.svg?height=80&width=80",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&h=150&auto=format&fit=crop&crop=faces",
       content: "I love competing with my friends on the leaderboards. Learning has never been this exciting before!",
       rating: 4,
     },
@@ -288,7 +288,10 @@ const LandingPage = () => {
             </div>
 
             <div className="text-center mt-12">
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-full inline-flex items-center transition-all">
+              <button 
+                onClick={handleGetStarted}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-full inline-flex items-center transition-all duration-300 ease-in-out"
+              >
                 Explore All Games
                 <ArrowRight className="ml-2" size={18} />
               </button>
@@ -392,7 +395,7 @@ const LandingPage = () => {
             className="max-w-7xl mx-auto"
           >
             <div className="text-center mb-12">
-              <div className="inline-block px-3 py-1 rounded-full bg-green-100 text-green-800 font-medium text-sm mb-3">
+              <div className="inline-block px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 font-medium text-sm mb-3">
                 Top Rated
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Featured Courses</h2>
@@ -418,7 +421,10 @@ const LandingPage = () => {
             </div>
 
             <div className="text-center mt-12">
-              <button className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white font-medium py-3 px-8 rounded-full inline-flex items-center transition-all shadow-lg">
+              <button 
+                onClick={handleGetStarted}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium py-3 px-8 rounded-full inline-flex items-center transition-all shadow-lg duration-300 ease-in-out"
+              >
                 Browse All Courses
                 <ArrowRight className="ml-2" size={18} />
               </button>
