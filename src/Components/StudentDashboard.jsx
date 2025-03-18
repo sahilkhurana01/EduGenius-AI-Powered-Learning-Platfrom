@@ -317,6 +317,11 @@ const StudentDashboard = () => {
               <HelpSupport />
             </div>
           )}
+
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-4">Resources</h2>
+            <ResourceLibrary userRole="student" />
+          </div>
         </main>
       </div>
     </div>
