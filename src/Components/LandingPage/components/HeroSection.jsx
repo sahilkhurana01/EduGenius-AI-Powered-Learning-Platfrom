@@ -146,13 +146,13 @@ const HeroSection = () => {
                 <img
                   src="/kid.jpg"
                   alt="Teenagers learning with EduGenius AI platform"
-                  className="relative rounded-2xl shadow-xl object-cover h-[380px] w-[600px]"
+                  className="relative rounded-2xl shadow-xl object-cover h-[380px] w-[650px]"
                 />
               </div>
             </div>
 
             {/* Decorative elements */}
-            <div className="absolute -top-6 -right-6 w-24 h-24 bg-yellow-400 rounded-full opacity-50"></div>
+            <div className="absolute -top-10 right-5 w-24 h-24 bg-yellow-400 rounded-full opacity-50"></div>
             <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-indigo-400 rounded-full opacity-30"></div>
 
             {/* Floating badges */}
