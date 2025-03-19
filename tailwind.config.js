@@ -17,6 +17,19 @@ export default {
       animation: {
         'pulse-light': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-light': 'bounce 1s ease-out 1',
+        'fade-in-down': 'fadeInDown 0.2s ease-out',
+      },
+      keyframes: {
+        fadeInDown: {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(-10px)'
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)'
+          },
+        }
       },
       transitionProperty: {
         'height': 'height',

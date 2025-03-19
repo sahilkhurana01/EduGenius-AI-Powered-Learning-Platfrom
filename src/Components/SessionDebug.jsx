@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { clearProfilePictureData } from '../utils/ProfilePictureManager';
 
 const SessionDebug = () => {
   const [sessionData, setSessionData] = useState({});
@@ -38,127 +39,56 @@ const SessionDebug = () => {
     }
   };
 
-  const clearAllSession = () => {
-    sessionStorage.clear();
-    setSessionData({});
+  const clearSession = () => {
+    // Use our utility to clear profile picture data properly
+    clearProfilePictureData();
+    
+    // Clear other session data
+    sessionStorage.removeItem('isAuthenticated');
+    sessionStorage.removeItem('userRole');
+    sessionStorage.removeItem('userName');
+    sessionStorage.removeItem('userEmail');
+    
+    // Force refresh the page to show updated state
+    window.location.reload();
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Session Storage Debug</h1>
-      
-      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-        <h2 className="text-lg font-semibold mb-2">Update Profile Photo URL</h2>
-        <div className="flex items-center gap-4">
-          <input
-            type="text"
-            className="flex-1 border border-gray-300 rounded-md px-3 py-2"
-            placeholder="Enter new photo URL"
-            value={newPhotoURL}
-            onChange={(e) => setNewPhotoURL(e.target.value)}
-          />
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-md"
-            onClick={handlePhotoUpdate}
-          >
-            Update
-          </button>
-        </div>
-        <div className="mt-4">
-          <button
-            className="bg-red-500 text-white px-4 py-2 rounded-md mr-2"
-            onClick={() => removeSessionValue('googlePhotoURL')}
-          >
-            Remove Photo URL
-          </button>
-          <button
-            className="bg-gray-500 text-white px-4 py-2 rounded-md"
-            onClick={clearAllSession}
-          >
-            Clear All Session Data
-          </button>
-        </div>
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">Session Debug</h1>
+      <div className="bg-gray-100 p-4 rounded mb-4">
+        <h2 className="font-semibold mb-2">Current Session Data:</h2>
+        <pre className="bg-white p-2 rounded">
+          {JSON.stringify(sessionData, null, 2)}
+        </pre>
       </div>
       
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Current Session Storage Data</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 rounded-md">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-2 px-4 border-b text-left">Key</th>
-                <th className="py-2 px-4 border-b text-left">Value</th>
-                <th className="py-2 px-4 border-b text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.keys(sessionData).length > 0 ? (
-                Object.entries(sessionData).map(([key, value]) => (
-                  <tr key={key} className="border-b hover:bg-gray-50">
-                    <td className="py-2 px-4 font-medium">{key}</td>
-                    <td className="py-2 px-4 overflow-hidden text-ellipsis max-w-xs">
-                      {key === 'googlePhotoURL' || key === 'userPhoto' ? (
-                        <div className="flex items-center gap-2">
-                          <img 
-                            src={value} 
-                            alt="Profile" 
-                            className="w-8 h-8 rounded-full"
-                            onError={(e) => {
-                              e.target.src = 'https://randomuser.me/api/portraits/women/45.jpg';
-                              e.target.classList.add('border', 'border-red-500');
-                            }}
-                          />
-                          <span className="text-xs truncate">{value}</span>
-                        </div>
-                      ) : (
-                        value
-                      )}
-                    </td>
-                    <td className="py-2 px-4 text-center">
-                      <button
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => removeSessionValue(key)}
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={3} className="py-4 text-center text-gray-500">
-                    No session storage data found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="mb-4">
+        <h2 className="font-semibold mb-2">Profile Picture:</h2>
+        {sessionData.userPhotoURL ? (
+          <div>
+            <img 
+              src={sessionData.userPhotoURL} 
+              alt="User Profile" 
+              className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://ui-avatars.com/api/?name=User&background=4f46e5&color=ffffff";
+              }}
+            />
+            <p className="mt-2 text-sm">URL: {sessionData.userPhotoURL}</p>
+          </div>
+        ) : (
+          <p>No profile picture URL stored</p>
+        )}
       </div>
       
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-        <h2 className="text-lg font-semibold mb-2">Set Common Values</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button
-            className="bg-green-500 text-white px-4 py-2 rounded-md"
-            onClick={() => {
-              updateSessionValue('isAuthenticated', 'true');
-              updateSessionValue('userRole', 'teacher');
-              updateSessionValue('userName', 'Sahil Khurana');
-              updateSessionValue('userEmail', 'sahil.khurana@example.com');
-              updateSessionValue('googlePhotoURL', 'https://lh3.googleusercontent.com/a/ACg8ocLkYAVjp-R_6hQj_2oOYG_Oq8dTfK71q1kZJYZ_mpFC=s96-c');
-            }}
-          >
-            Set Test User (Sahil)
-          </button>
-          <button
-            className="bg-yellow-500 text-white px-4 py-2 rounded-md"
-            onClick={() => window.location.href = '/dashboard'}
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      </div>
+      <button
+        onClick={clearSession}
+        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+      >
+        Clear Session Data
+      </button>
     </div>
   );
 };

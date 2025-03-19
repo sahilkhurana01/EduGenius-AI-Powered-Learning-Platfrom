@@ -11,6 +11,7 @@ import {
     signInWithPopup,
     updateProfile
 } from "firebase/auth";
+import { saveProfilePicture, clearProfilePictureData } from '../utils/ProfilePictureManager';
 
 
 const AuthPage = () => {
@@ -174,6 +175,7 @@ const AuthPage = () => {
         }
     };
 
+    // Modified Google login function
     const googleLogin = async () => {
         try {
             setLoading(true);
@@ -187,14 +189,17 @@ const AuthPage = () => {
             setLoginData({ email: '', password: '' });
             setSignupData({ name: '', email: '', password: '' });
             
-            // Store profile photo URL in session storage
+            // Store profile photo URL using the ProfilePictureManager
             if (result.user?.photoURL) {
                 console.log('Storing Google profile picture URL:', result.user.photoURL);
+                // Mark as Google photo for priority treatment
+                const userRole = sessionStorage.getItem('userRole') || 'student';
+                saveProfilePicture(result.user.photoURL, userRole, true);
+                
+                // Also store it specifically as googlePhotoURL for backward compatibility
                 sessionStorage.setItem('googlePhotoURL', result.user.photoURL);
                 
-                // Log to see if the URL is correctly stored
-                const storedURL = sessionStorage.getItem('googlePhotoURL');
-                console.log('Verified stored Google photo URL:', storedURL);
+                console.log('Google profile picture stored successfully');
             } else {
                 console.warn('No profile picture URL found in Google login result');
             }
@@ -213,8 +218,11 @@ const AuthPage = () => {
         }
     };
 
-    // Simulate Google login for demonstration (if used)
+    // Modified simulateGoogleLogin function
     const simulateGoogleLogin = () => {
+        // Clear any existing profile picture data first
+        clearProfilePictureData();
+        
         // Simulate delay of API call
         setTimeout(() => {
             // Get the user role that was set in the role selection page
@@ -226,7 +234,7 @@ const AuthPage = () => {
                 email: userRole === 'teacher' ? 'sahil.khurana@gmail.com' : 'student@example.com',
                 uid: Math.random().toString(36).substring(2),
                 // Use a real Google profile picture URL format
-                photoURL: 'https://lh3.googleusercontent.com/a/ACg8ocLkYAVjp-R_6hQj_2oOYG_Oq8dTfK71q1kZJYZ_mpFC=s96-c'
+                photoURL: 'https://randomuser.me/api/portraits/women/32.jpg'
             };
             
             console.log('Google login successful with data:', mockGoogleUser);
@@ -237,12 +245,14 @@ const AuthPage = () => {
             sessionStorage.setItem('userName', mockGoogleUser.displayName);
             sessionStorage.setItem('userEmail', mockGoogleUser.email);
             sessionStorage.setItem('userId', mockGoogleUser.uid);
-            sessionStorage.setItem('googlePhotoURL', mockGoogleUser.photoURL);
+            
+            // Store photo URL using our manager - simplified approach
+            saveProfilePicture(mockGoogleUser.photoURL);
             
             console.log('Stored in session storage:', {
                 userName: mockGoogleUser.displayName,
                 userEmail: mockGoogleUser.email,
-                googlePhotoURL: mockGoogleUser.photoURL,
+                photoURL: sessionStorage.getItem('userPhotoURL'),
                 userRole
             });
             

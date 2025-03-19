@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { preloadProfilePicture, handleProfilePictureError, handleLogout } from '../utils/ProfilePictureManager';
 import RecentActivity from './dashboard/RecentActivity';
 import ResourceLibrary from './dashboard/ResourceLibrary';
 import MyCourses from './dashboard/MyCourses';
@@ -10,6 +11,7 @@ import LessonsTab from './dashboard/LessonsTab';
 import WeeklyActivity from './dashboard/WeeklyActivity';
 import HelpSupport from './dashboard/HelpSupport';
 import CourseSettings from './dashboard/CourseSettings';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -19,7 +21,8 @@ const StudentDashboard = () => {
     photoURL: 'https://randomuser.me/api/portraits/men/32.jpg',
     email: 'alex.johnson@example.com'
   });
-  const [profilePictureLoading, setProfilePictureLoading] = useState(false);
+  const [profilePictureLoading, setProfilePictureLoading] = useState(true);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   // Check if user is authenticated and is a student
@@ -32,31 +35,61 @@ const StudentDashboard = () => {
     } else {
       // Fetch user data from session storage if available
       const userName = sessionStorage.getItem('userName');
-      const userPhoto = sessionStorage.getItem('userPhoto');
       const userEmail = sessionStorage.getItem('userEmail');
-      const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
       
-      console.log('Available user data:', { 
-        userName, 
-        userPhoto, 
-        userEmail, 
-        googlePhotoURL 
-      });
+      // Update basic user data
+      setUserData(prevData => ({
+        ...prevData,
+        name: userName || prevData.name,
+        email: userEmail || prevData.email,
+      }));
       
-      // Update user data from session storage - prioritize Google photo if available
-      setUserData({
-        name: userName || userData.name,
-        photoURL: googlePhotoURL || userPhoto || userData.photoURL,
-        email: userEmail || userData.email
-      });
-      
-      console.log('Updated user data:', { 
-        name: userName || userData.name,
-        photoURL: googlePhotoURL || userPhoto || userData.photoURL,
-        email: userEmail || userData.email
-      });
+      // Load profile picture using enhanced management
+      loadProfilePicture();
     }
   }, [navigate]);
+
+  // Enhanced profile picture loading with better error handling
+  const loadProfilePicture = () => {
+    setProfilePictureLoading(true);
+    try {
+      // Check first if we have a Google photo URL (highest priority)
+      const googlePhotoUrl = sessionStorage.getItem('googlePhotoURL');
+      
+      // Get profile URL from our centralized manager
+      const photoUrl = googlePhotoUrl || preloadProfilePicture('student');
+      
+      // Update the user data with the photo URL
+      setUserData(prevData => ({
+        ...prevData,
+        photoURL: photoUrl
+      }));
+      
+      console.log('Profile picture loaded in StudentDashboard:', photoUrl);
+    } catch (error) {
+      console.error('Error loading profile picture:', error);
+      // Fall back to default picture on error
+      setUserData(prevData => ({
+        ...prevData,
+        photoURL: 'https://randomuser.me/api/portraits/men/32.jpg'
+      }));
+    } finally {
+      setProfilePictureLoading(false);
+    }
+  };
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const toggleProfileMenu = () => {
+    setProfileMenuOpen(!profileMenuOpen);
+  };
+
+  // Add missing logoutUser function
+  const logoutUser = () => {
+    handleLogout(navigate);
+  };
 
   // Default stats for student dashboard
   const dashboardStats = {
@@ -65,72 +98,6 @@ const StudentDashboard = () => {
     quizAvg: 87,
     nextExam: "May 15",
   };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  // Function to handle Google login for profile picture
-  const fetchGoogleProfilePicture = async () => {
-    setProfilePictureLoading(true);
-    try {
-      // Get the Google photo URL directly from session storage
-      const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
-      
-      if (googlePhotoURL) {
-        console.log('Found Google profile picture URL:', googlePhotoURL);
-        
-        // Check if the image URL is valid
-        const img = new Image();
-        img.onload = () => {
-          console.log('Google profile image loaded successfully:', googlePhotoURL);
-          setUserData(prevData => ({
-            ...prevData,
-            photoURL: googlePhotoURL
-          }));
-        };
-        img.onerror = () => {
-          console.error('Failed to load Google profile image URL:', googlePhotoURL);
-          // Keep the current photo URL or fallback to default
-        };
-        img.src = googlePhotoURL;
-      } else {
-        console.warn('No Google profile picture URL found in session storage');
-      }
-    } catch (error) {
-      console.error('Error fetching Google profile picture:', error);
-    } finally {
-      setProfilePictureLoading(false);
-    }
-  };
-
-  // Fetch Google profile picture on component mount
-  useEffect(() => {
-    // Check if we already have the user's photo
-    const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
-    
-    if (googlePhotoURL) {
-      console.log('Google photo URL found in session storage:', googlePhotoURL);
-      
-      // Set the photo URL immediately
-      setUserData(prevData => ({
-        ...prevData,
-        photoURL: googlePhotoURL
-      }));
-      
-      // Also verify the image can be loaded
-      const img = new Image();
-      img.onload = () => {
-        console.log('Google profile image loaded successfully');
-      };
-      img.onerror = () => {
-        console.error('Failed to load Google profile image, falling back to default');
-      };
-      img.src = googlePhotoURL;
-    } else {
-      console.log('No Google photo URL found in session storage');
-    }
-  }, []);
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
@@ -181,21 +148,12 @@ const StudentDashboard = () => {
           <div className="mt-auto">
             <div className={`border-t pt-4 ${sidebarOpen ? '' : 'flex justify-center'}`}>
               <button 
-                className={`flex items-center ${sidebarOpen ? 'text-yellow-500 space-x-2' : 'justify-center text-yellow-500'} hover:text-yellow-600`}
-                onClick={() => {
-                  sessionStorage.removeItem('isAuthenticated');
-                  sessionStorage.removeItem('userRole');
-                  sessionStorage.removeItem('userName');
-                  sessionStorage.removeItem('userPhoto');
-                  sessionStorage.removeItem('userEmail');
-                  sessionStorage.removeItem('googlePhotoURL');
-                  navigate('/login');
-                }}
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                onClick={logoutUser} 
+                className="flex items-center text-gray-500 hover:text-indigo-600 transition-colors duration-200">
+                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                {sidebarOpen && <span>Logout</span>}
+                <span className={`ml-2 ${!sidebarOpen ? 'hidden' : ''}`}>Logout</span>
               </button>
             </div>
           </div>
@@ -214,41 +172,55 @@ const StudentDashboard = () => {
               </svg>
               <span className="absolute -top-1 -right-1 bg-yellow-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">3</span>
             </button>
-            <div className="flex items-center space-x-2 cursor-pointer group relative">
-              <div className="h-8 w-8 rounded-full overflow-hidden border-2 border-transparent group-hover:border-indigo-500 transition-all duration-200 relative">
-                {profilePictureLoading ? (
-                  <div className="h-full w-full flex items-center justify-center bg-gray-200">
-                    <svg className="animate-spin h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  </div>
-                ) : (
+            
+            {/* Updated profile dropdown */}
+            <div className="relative flex items-center cursor-pointer group" onClick={toggleProfileMenu}>
+              {profilePictureLoading ? (
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+              ) : (
+                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-transparent group-hover:border-indigo-500 transition-all duration-200">
                   <img 
-                    src={userData.photoURL || 'https://randomuser.me/api/portraits/men/32.jpg'} 
+                    src={userData.photoURL} 
                     alt="Profile" 
-                    className="h-full w-full object-cover"
+                    className="w-full h-full object-cover"
                     onError={(e) => {
-                      // Fallback to default image if the profile picture fails to load
-                      console.error('Profile image failed to load, falling back to default', userData.photoURL);
-                      e.target.src = 'https://randomuser.me/api/portraits/men/32.jpg';
+                      e.target.src = handleProfilePictureError(e, 'student');
                     }}
                   />
-                )}
+                </div>
+              )}
+              <div className="ml-2">
+                <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-600">{userData.name}</span>
+                <ChevronDownIcon
+                  className={`h-4 w-4 ml-1 text-gray-500 group-hover:text-indigo-500 transition-transform duration-200 ${
+                    profileMenuOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
               </div>
-              <span className="text-sm font-medium text-indigo-800 group-hover:text-indigo-600 transition-colors duration-200">{userData.name}</span>
               
-              {/* User dropdown (hidden by default) */}
-              <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-md shadow-lg overflow-hidden z-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">{userData.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{userData.email}</p>
+              {/* Dropdown menu */}
+              {profileMenuOpen && (
+                <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-md shadow-lg overflow-hidden z-20 
+                               animate-fade-in-down origin-top-right">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900">{userData.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{userData.email}</p>
+                  </div>
+                  <div className="py-1">
+                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700">Profile Settings</a>
+                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700">Preferences</a>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLogout(navigate);
+                      }} 
+                      className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Sign out
+                    </button>
+                  </div>
                 </div>
-                <div className="py-1">
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700">Profile Settings</a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700">Preferences</a>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </header>
