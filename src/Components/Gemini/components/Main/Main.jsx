@@ -26,6 +26,56 @@ const Main = () => {
         }
     }, []);
 
+    // Ensure the user photo is properly loaded and fallback to a default if needed
+    useEffect(() => {
+        const loadUserPhoto = () => {
+            try {
+                // First check for Google photo (highest priority)
+                const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
+                
+                if (googlePhotoURL) {
+                    console.log('Using Google profile picture in Gemini Main');
+                    
+                    // Pre-validate the image
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.referrerPolicy = "no-referrer";
+                    
+                    img.onload = () => {
+                        console.log('Google profile image validated in Gemini Main');
+                        setUserPhoto(googlePhotoURL);
+                    };
+                    
+                    img.onerror = () => {
+                        console.warn('Google profile image failed to load in Gemini Main, using default');
+                        // Fallback to any other user photo or default
+                        const userProfile = sessionStorage.getItem('userPhotoURL') || assets.user_icon;
+                        setUserPhoto(userProfile);
+                    };
+                    
+                    // Start loading the image
+                    img.src = googlePhotoURL;
+                    return;
+                }
+                
+                // Try regular user photo
+                const userProfile = sessionStorage.getItem('userPhotoURL');
+                if (userProfile) {
+                    setUserPhoto(userProfile);
+                    return;
+                }
+                
+                // Default fallback
+                setUserPhoto(assets.user_icon);
+            } catch (error) {
+                console.error('Error loading user photo in Gemini Main:', error);
+                setUserPhoto(assets.user_icon);
+            }
+        };
+        
+        loadUserPhoto();
+    }, []);
+
     const handleKeyPress = (e) => {
         if (e.key === 'Enter' && input) {
             onSent();
@@ -62,7 +112,16 @@ const Main = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                         </svg>
                     </button>
-                    <img src={userPhoto} alt="Profile" />
+                    <img 
+                        src={userPhoto} 
+                        alt="Profile"
+                        referrerPolicy="no-referrer"
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                            console.warn('Failed to load profile image in Gemini Main');
+                            e.target.src = assets.user_icon;
+                        }} 
+                    />
                 </div>
             </div>
             <div className="gemini-main-container">
@@ -93,7 +152,16 @@ const Main = () => {
                 </>
                 :<div className="gemini-result">
                     <div className="gemini-result-title">
-                        <img src={userPhoto} alt="Profile" />
+                        <img 
+                            src={userPhoto} 
+                            alt="Profile"
+                            referrerPolicy="no-referrer"
+                            crossOrigin="anonymous"
+                            onError={(e) => {
+                                console.warn('Failed to load profile image in Gemini Main');
+                                e.target.src = assets.user_icon;
+                            }} 
+                        />
                         <p>{recentPrompt}</p>
                     </div>
                     <div className="gemini-result-data">

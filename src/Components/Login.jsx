@@ -94,7 +94,13 @@ const AuthPage = () => {
         // Store the user's profile picture if available
         if (user.photoURL) {
             console.log('Storing user profile photo URL:', user.photoURL);
+            // Check if it's a Google photo (contains googleusercontent.com)
+            const isGooglePhoto = user.photoURL.includes('googleusercontent.com');
+            // Set the Google photo URL with priority
             sessionStorage.setItem('googlePhotoURL', user.photoURL);
+            // Also use our profile picture manager to ensure it's stored properly
+            const userRole = sessionStorage.getItem('userRole') || 'student';
+            saveProfilePicture(user.photoURL, userRole, isGooglePhoto);
         }
         
         console.log('All session storage data set:', {
@@ -180,7 +186,24 @@ const AuthPage = () => {
         try {
             setLoading(true);
             setError('');
+            
+            // Clear session storage first to prevent any conflicts
+            Object.keys(sessionStorage).forEach(key => {
+                sessionStorage.removeItem(key);
+            });
+            
+            // Then clear any existing profile data
+            clearProfilePictureData();
+            
+            // Save user role first because we're going to need it
+            const selectedRole = sessionStorage.getItem('userRole') || 'student';
+            sessionStorage.setItem('userRole', selectedRole);
+            
             const provider = new GoogleAuthProvider();
+            // Request profile scope to ensure we get profile data
+            provider.addScope('profile');
+            provider.addScope('email');
+            
             const result = await signInWithPopup(auth, provider);
             console.log('Google login successful');
             console.log('Google user data:', result.user);
@@ -192,24 +215,44 @@ const AuthPage = () => {
             // Store profile photo URL using the ProfilePictureManager
             if (result.user?.photoURL) {
                 console.log('Storing Google profile picture URL:', result.user.photoURL);
-                // Mark as Google photo for priority treatment
-                const userRole = sessionStorage.getItem('userRole') || 'student';
-                saveProfilePicture(result.user.photoURL, userRole, true);
                 
-                // Also store it specifically as googlePhotoURL for backward compatibility
-                sessionStorage.setItem('googlePhotoURL', result.user.photoURL);
+                // Pre-load the image to validate it works before saving
+                const img = new Image();
+                img.onload = () => {
+                    console.log('Google profile picture pre-loaded successfully');
+                    
+                    // Mark as Google photo for priority treatment
+                    const userRole = sessionStorage.getItem('userRole') || 'student';
+                    // Always mark Google photos as true for isGooglePhoto
+                    saveProfilePicture(result.user.photoURL, userRole, true);
+                    
+                    // Navigate to appropriate dashboard if not already done
+                    if (!sessionStorage.getItem('isAuthenticated')) {
+                        navigateAfterLogin(result.user);
+                    }
+                };
                 
-                console.log('Google profile picture stored successfully');
+                img.onerror = () => {
+                    console.warn('Google profile picture failed to pre-load, using alternative method');
+                    // Use alternative method to save profile picture
+                    const userRole = sessionStorage.getItem('userRole') || 'student';
+                    saveProfilePicture(result.user.photoURL, userRole, true);
+                    
+                    // Navigate to appropriate dashboard if not already done
+                    if (!sessionStorage.getItem('isAuthenticated')) {
+                        navigateAfterLogin(result.user);
+                    }
+                };
+                
+                // Start loading the image
+                img.src = result.user.photoURL;
+                
+                // Also immediately navigate to avoid delays
+                navigateAfterLogin(result.user);
             } else {
                 console.warn('No profile picture URL found in Google login result');
+                navigateAfterLogin(result.user);
             }
-            
-            // Set user role from previously selected role
-            const userRole = sessionStorage.getItem('userRole') || 'student';
-            console.log('User role for navigation:', userRole);
-            
-            // Navigate to appropriate dashboard
-            navigateAfterLogin(result.user);
         } catch (error) {
             setError(error.message);
             console.error('Google login error:', error.message);
@@ -220,51 +263,38 @@ const AuthPage = () => {
 
     // Modified simulateGoogleLogin function
     const simulateGoogleLogin = () => {
-        // Clear any existing profile picture data first
+        // Clear session storage first to prevent any conflicts
+        Object.keys(sessionStorage).forEach(key => {
+            sessionStorage.removeItem(key);
+        });
+        
+        // Then clear any existing profile picture data
         clearProfilePictureData();
+        
+        // Save user role first because we're going to need it
+        const selectedRole = userRole || 'student';
+        sessionStorage.setItem('userRole', selectedRole);
+        
+        setLoading(true);
         
         // Simulate delay of API call
         setTimeout(() => {
-            // Get the user role that was set in the role selection page
-            const userRole = sessionStorage.getItem('userRole');
-            
             // Mock Google user data with the appropriate details
             const mockGoogleUser = {
-                displayName: userRole === 'teacher' ? 'Sahil Khurana' : 'Student User',
-                email: userRole === 'teacher' ? 'sahil.khurana@gmail.com' : 'student@example.com',
+                displayName: selectedRole === 'teacher' ? 'Sahil Khurana' : 'Student User',
+                email: selectedRole === 'teacher' ? 'sahil.khurana@gmail.com' : 'student@example.com',
                 uid: Math.random().toString(36).substring(2),
                 // Use a real Google profile picture URL format
-                photoURL: 'https://randomuser.me/api/portraits/women/32.jpg'
+                photoURL: 'https://lh3.googleusercontent.com/a-/mock-google-profile-picture'
             };
             
             console.log('Google login successful with data:', mockGoogleUser);
             
-            // Save to session storage
-            sessionStorage.setItem('isAuthenticated', 'true');
-            // Do NOT override the role here, we want to keep the user's selection
-            sessionStorage.setItem('userName', mockGoogleUser.displayName);
-            sessionStorage.setItem('userEmail', mockGoogleUser.email);
-            sessionStorage.setItem('userId', mockGoogleUser.uid);
+            // Store photo URL using our manager - mark as Google photo
+            saveProfilePicture(mockGoogleUser.photoURL, selectedRole, true);
             
-            // Store photo URL using our manager - simplified approach
-            saveProfilePicture(mockGoogleUser.photoURL);
-            
-            console.log('Stored in session storage:', {
-                userName: mockGoogleUser.displayName,
-                userEmail: mockGoogleUser.email,
-                photoURL: sessionStorage.getItem('userPhotoURL'),
-                userRole
-            });
-            
-            // Navigate to the appropriate dashboard based on role
-            if (userRole === 'teacher') {
-                navigate('/teacher-dashboard');
-            } else if (userRole === 'student') {
-                navigate('/student-dashboard');
-            } else {
-                // If no valid role, go to role selection
-                navigate('/');
-            }
+            // Navigate to dashboard
+            navigateAfterLogin(mockGoogleUser);
             
             setLoading(false);
         }, 1000);
