@@ -64,6 +64,16 @@ const LanguageSettings = () => {
       // Apply the language change immediately
       applyGoogleTranslate(selectedLanguage);
       
+      // If Google Translate is blocked, manually update page UI elements
+      if (isTranslateBlocked) {
+        document.querySelectorAll('[data-translatable]').forEach(element => {
+          const key = element.getAttribute('data-translatable');
+          if (key) {
+            element.textContent = manualTranslate(key, selectedLanguage);
+          }
+        });
+      }
+      
       // Update saved settings
       setSavedSettings({ language: selectedLanguage, resetOnLogout });
       
@@ -99,7 +109,7 @@ const LanguageSettings = () => {
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4" data-translatable="Language Settings">
           {getTranslatedText('Language Settings')}
         </h2>
         
@@ -114,7 +124,7 @@ const LanguageSettings = () => {
         )}
         
         <div className="mb-6">
-          <label htmlFor="language-select" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="language-select" className="block text-sm font-medium text-gray-700 mb-2" data-translatable="Select Interface Language">
             {getTranslatedText('Select Interface Language')}
           </label>
           <select
@@ -129,7 +139,7 @@ const LanguageSettings = () => {
               </option>
             ))}
           </select>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-500" data-translatable="This will change the language">
             {getTranslatedText('This will change the language of the entire interface using Google Translate.')}
           </p>
         </div>
@@ -146,10 +156,10 @@ const LanguageSettings = () => {
             />
           </div>
           <div className="ml-3 text-sm">
-            <label htmlFor="reset-on-logout" className="font-medium text-gray-700">
+            <label htmlFor="reset-on-logout" className="font-medium text-gray-700" data-translatable="Reset to English">
               {getTranslatedText('Reset to English on logout')}
             </label>
-            <p className="text-gray-500">
+            <p className="text-gray-500" data-translatable="When you log out">
               {getTranslatedText('When you log out, the language will be reset to English for the next user.')}
             </p>
           </div>
@@ -171,6 +181,7 @@ const LanguageSettings = () => {
               ? 'bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
+          data-translatable="Save Changes"
         >
           {getTranslatedText('Save Changes')}
         </button>
@@ -179,4 +190,4 @@ const LanguageSettings = () => {
   );
 };
 
-export default LanguageSettings; 
+export default LanguageSettings;

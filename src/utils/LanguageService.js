@@ -229,61 +229,57 @@ export const initializeGoogleTranslate = () => {
     const currentLang = getCurrentLanguage();
     console.log('Initializing Google Translate with language:', currentLang);
     
-    // First check if Google Translate might be blocked
-    if (checkTranslateBlockedStatus()) {
-      console.warn('Google Translate appears to be blocked by an ad blocker - using limited functionality');
-      // Still save the language preference
-      sessionStorage.setItem(STORAGE_KEY, currentLang);
+    // If Google Translate is already loaded and initialized, just apply the saved language
+    if (window.google && window.google.translate && document.querySelector('.goog-te-combo')) {
+      console.log('Google Translate already loaded, applying saved language');
+      applyGoogleTranslate(currentLang);
       return;
     }
     
-    // Define the initialization function for Google Translate
-    window.googleTranslateElementInit = function() {
-      try {
-        if (window.google && window.google.translate) {
-          new window.google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: supportedLanguages.map(lang => lang.code).join(','),
-            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false
-          }, 'google_translate_element');
-          
-          // Apply the saved language preference after a short delay to ensure initialization
-          if (currentLang && currentLang !== DEFAULT_LANGUAGE) {
-            setTimeout(() => applyGoogleTranslate(currentLang), 500);
-          }
-          console.log('Google Translate initialized successfully');
-        }
-      } catch (e) {
-        console.warn('Google Translate initialization issue:', e);
-        sessionStorage.setItem('google_translate_blocked', 'true');
-      }
-    };
-    
-    // Create a hidden Google Translate element if it doesn't exist
-    if (!document.getElementById('google_translate_element')) {
-      const translateElement = document.createElement('div');
-      translateElement.id = 'google_translate_element';
-      translateElement.style.display = 'none';
-      document.body.appendChild(translateElement);
+    // Check if Google Translate is blocked
+    if (sessionStorage.getItem('google_translate_blocked') === 'true') {
+      console.warn('Google Translate appears to be blocked - using manual translations only');
+      return;
     }
     
-    // If Google Translate is already loaded, trigger initialization
-    if (window.google && window.google.translate) {
-      window.googleTranslateElementInit();
-    } else {
-      // Load the Google Translate script if it's not already present
-      if (!document.querySelector('script[src*="translate.google.com"]')) {
-        const script = document.createElement('script');
-        script.src = 'https://translate.googleapis.com/translate_a/element.js?cb=googleTranslateElementInit';
-        script.async = true;
-        script.onerror = () => {
-          console.warn('Google Translate script failed to load');
+    // If loadGoogleTranslate function exists, we can call it directly
+    if (typeof window.loadGoogleTranslate === 'function') {
+      window.loadGoogleTranslate();
+      return;
+    }
+    
+    // Fallback: Define loadGoogleTranslate if it doesn't exist yet
+    // This is for components that might initialize before the script in index.html loads
+    if (typeof window.loadGoogleTranslate !== 'function') {
+      window.loadGoogleTranslate = function() {
+        try {
+          if (window.google && window.google.translate) {
+            new window.google.translate.TranslateElement({
+              pageLanguage: 'en',
+              includedLanguages: supportedLanguages.map(lang => lang.code).join(','),
+              layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+              autoDisplay: false
+            }, 'google_element');
+            
+            // Apply the saved language preference
+            if (currentLang && currentLang !== DEFAULT_LANGUAGE) {
+              setTimeout(() => applyGoogleTranslate(currentLang), 1000);
+            }
+          }
+        } catch (e) {
+          console.warn('Google Translate initialization error:', e);
           sessionStorage.setItem('google_translate_blocked', 'true');
-        };
-        document.body.appendChild(script);
-      }
-      console.log('Waiting for Google Translate to load...');
+        }
+      };
+    }
+    
+    // Check for necessary elements
+    if (!document.getElementById('google_element')) {
+      console.warn('Google element container not found, creating one');
+      const translateElement = document.createElement('div');
+      translateElement.id = 'google_element';
+      translateElement.style.display = 'none';
+      document.body.appendChild(translateElement);
     }
   } catch (error) {
     console.error('Error initializing Google Translate:', error);
@@ -310,7 +306,7 @@ export const applyGoogleTranslate = (langCode) => {
     if (langCode === DEFAULT_LANGUAGE) {
       if (window.google && window.google.translate) {
         // Try to find the "No translation" or "Show original" button to reset
-        const selectElement = document.querySelector('select.goog-te-combo');
+        const selectElement = document.querySelector('.goog-te-combo');
         if (selectElement) {
           selectElement.value = DEFAULT_LANGUAGE;
           selectElement.dispatchEvent(new Event('change'));
@@ -336,62 +332,35 @@ export const applyGoogleTranslate = (langCode) => {
     
     // Check if Google Translate is loaded
     if (!window.google || !window.google.translate) {
-      console.warn('Google Translate not loaded yet, but language preference has been saved');
-      // Try to initialize Google Translate again
-      initializeGoogleTranslate();
+      console.warn('Google Translate not loaded yet, attempting to initialize');
+      
+      // If loadGoogleTranslate function exists, we can call it directly
+      if (typeof window.loadGoogleTranslate === 'function') {
+        window.loadGoogleTranslate();
+        
+        // Set a timeout to try applying the language after initialization
+        setTimeout(() => {
+          const selectElement = document.querySelector('.goog-te-combo');
+          if (selectElement) {
+            selectElement.value = langCode;
+            selectElement.dispatchEvent(new Event('change'));
+            console.log(`Applied language change to ${langCode} after initialization`);
+          }
+        }, 1500);
+      }
       return;
     }
     
-    // Find Google Translate elements using multiple methods for better compatibility
-    const findTranslateElement = () => {
-      // Try different selector strategies
-      const selectors = [
-        '.goog-te-combo',
-        'select.goog-te-combo',
-        '#\\:0\\.targetLanguage',
-        '[id^=":"][id$=".targetLanguage"]'
-      ];
-      
-      for (const selector of selectors) {
-        const element = document.querySelector(selector);
-        if (element) return element;
-      }
-      
-      // If still not found, try iframe approach
-      try {
-        const frame = document.querySelector('.goog-te-menu-frame');
-        if (frame) {
-          const doc = frame.contentDocument || frame.contentWindow.document;
-          return doc.querySelector('.goog-te-menu2-item');
-        }
-      } catch (e) {
-        console.warn('Could not access translate frame:', e);
-      }
-      
-      return null;
-    };
-    
-    // Get translate element
-    const translateElement = findTranslateElement();
-    
-    if (translateElement) {
-      // Set language and trigger change
-      translateElement.value = langCode;
-      translateElement.dispatchEvent(new Event('change'));
+    // Find the language selector dropdown
+    const selectElement = document.querySelector('.goog-te-combo');
+    if (selectElement) {
+      selectElement.value = langCode;
+      selectElement.dispatchEvent(new Event('change'));
       console.log(`Applied language change to ${langCode}`);
-    } else {
-      console.warn('Google Translate elements not found, but preference has been saved');
-      
-      // Create a retry mechanism
-      const retryCount = parseInt(sessionStorage.getItem('translate_retry_count') || '0');
-      if (retryCount < 3) {
-        sessionStorage.setItem('translate_retry_count', (retryCount + 1).toString());
-        setTimeout(() => applyGoogleTranslate(langCode), 1000); // Retry after 1 second
-      } else {
-        sessionStorage.removeItem('translate_retry_count');
-        console.error('Failed to apply translation after multiple attempts');
-      }
+      return;
     }
+    
+    console.warn('Google Translate dropdown not found - language preference saved but not applied');
   } catch (error) {
     console.error('Error applying Google Translate:', error);
   }
