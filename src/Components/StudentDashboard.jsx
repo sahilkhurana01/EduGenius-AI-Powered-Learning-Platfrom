@@ -11,6 +11,7 @@ import LessonsTab from './dashboard/LessonsTab';
 import WeeklyActivity from './dashboard/WeeklyActivity';
 import HelpSupport from './dashboard/HelpSupport';
 import CourseSettings from './dashboard/CourseSettings';
+import DailyQuiz from './dashboard/DailyQuiz';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
 
 const StudentDashboard = () => {
@@ -99,6 +100,37 @@ const StudentDashboard = () => {
     nextExam: "May 15",
   };
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return (
+          <div className="space-y-6">
+            <StatCards stats={dashboardStats} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <RecentActivity />
+              <WeeklyActivity />
+            </div>
+            <MyCourses />
+            <ResourceLibrary />
+          </div>
+        );
+      case 'messages':
+        return <MessagesTab />;
+      case 'calendar':
+        return <CalendarTab />;
+      case 'lessons':
+        return <LessonsTab />;
+      case 'help':
+        return <HelpSupport />;
+      case 'settings':
+        return <CourseSettings />;
+      case 'daily-quiz':
+        return <DailyQuiz />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       {/* Sidebar */}
@@ -141,6 +173,7 @@ const StudentDashboard = () => {
             }} />
             <NavItem icon="resources" label="Resources" active={activeTab === 'resources'} collapsed={!sidebarOpen} onClick={() => setActiveTab('resources')} />
             <NavItem icon="calendar" label="Calendar" active={activeTab === 'calendar'} collapsed={!sidebarOpen} onClick={() => setActiveTab('calendar')} />
+            <NavItem icon="daily-quiz" label="Daily Quiz" active={activeTab === 'daily-quiz'} collapsed={!sidebarOpen} onClick={() => setActiveTab('daily-quiz')} />
             <NavItem icon="messages" label="Messages" active={activeTab === 'messages'} collapsed={!sidebarOpen} onClick={() => setActiveTab('messages')} />
             <NavItem icon="help" label="Help & Support" active={activeTab === 'help'} collapsed={!sidebarOpen} onClick={() => setActiveTab('help')} />
           </div>
@@ -232,91 +265,7 @@ const StudentDashboard = () => {
             <p className="text-gray-500">Welcome back, {userData.name}. Here's what's happening with your courses today.</p>
           </div>
           
-          {/* Dashboard View */}
-          {activeTab === 'dashboard' && (
-            <div className="space-y-6">
-              <StatCards stats={dashboardStats} />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-lg font-medium text-indigo-800 mb-4">My Learning Progress</h2>
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">Mathematics - Algebra</span>
-                      <span className="text-sm font-medium text-indigo-600">85%</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '85%' }}></div>
-                    </div>
-                    
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">Physics - Mechanics</span>
-                      <span className="text-sm font-medium text-indigo-600">62%</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '62%' }}></div>
-                    </div>
-                    
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">Literature - Modern Fiction</span>
-                      <span className="text-sm font-medium text-indigo-600">78%</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '78%' }}></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Recent Activity</h2>
-                  <RecentActivity />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-lg font-medium text-indigo-800 mb-4">My Courses</h2>
-                  <MyCourses />
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
-                  <ResourceLibrary />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Lessons Tab */}
-          {activeTab === 'courses' && (
-            <div className="transition-opacity duration-300">
-              <MyCourses />
-            </div>
-          )}
-
-          {/* Resources Tab */}
-          {activeTab === 'resources' && (
-            <div className="transition-opacity duration-300">
-              <ResourceLibrary />
-            </div>
-          )}
-
-          {/* Calendar Tab */}
-          {activeTab === 'calendar' && (
-            <div className="transition-opacity duration-300">
-              <CalendarTab />
-            </div>
-          )}
-
-          {/* Messages Tab */}
-          {activeTab === 'messages' && (
-            <div className="transition-opacity duration-300">
-              <MessagesTab />
-            </div>
-          )}
-
-          {/* Help & Support Tab */}
-          {activeTab === 'help' && (
-            <div className="transition-opacity duration-300">
-              <HelpSupport />
-            </div>
-          )}
+          {renderContent()}
         </main>
       </div>
     </div>
@@ -332,6 +281,12 @@ const NavItem = ({ icon, label, active, collapsed, onClick }) => {
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+          </svg>
+        );
+      case 'daily-quiz':
+        return (
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
           </svg>
         );
       case 'courses':
