@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { preloadProfilePicture, handleProfilePictureError, handleLogout } from '../utils/ProfilePictureManager';
+import { initializeGoogleTranslate } from '../utils/LanguageService';
 import RecentActivity from './dashboard/RecentActivity';
 import ResourceLibrary from './dashboard/ResourceLibrary';
 import StudentProgress from './dashboard/StudentProgress';
@@ -47,6 +48,9 @@ const TeacherDashboard = () => {
       
       // Load profile picture using enhanced management
       loadProfilePicture();
+      
+      // Initialize Google Translate
+      initializeGoogleTranslate();
     }
   }, [navigate]);
 
@@ -57,8 +61,39 @@ const TeacherDashboard = () => {
       // Check first if we have a Google photo URL (highest priority)
       const googlePhotoUrl = sessionStorage.getItem('googlePhotoURL');
       
-      // Get profile URL from our centralized manager
-      const photoUrl = googlePhotoUrl || preloadProfilePicture('teacher');
+      if (googlePhotoUrl) {
+        console.log('Using Google profile picture in TeacherDashboard:', googlePhotoUrl);
+        
+        // Pre-validate the image before displaying
+        const img = new Image();
+        img.onload = () => {
+          console.log('Google profile picture validated successfully');
+          // Directly update UI with Google photo
+          setUserData(prevData => ({
+            ...prevData,
+            photoURL: googlePhotoUrl
+          }));
+          setProfilePictureLoading(false);
+        };
+        
+        img.onerror = () => {
+          console.warn('Google profile picture failed validation, falling back to default');
+          // Fallback to default or cached profile picture
+          const photoUrl = preloadProfilePicture('teacher');
+          setUserData(prevData => ({
+            ...prevData,
+            photoURL: photoUrl
+          }));
+          setProfilePictureLoading(false);
+        };
+        
+        // Start loading the image
+        img.src = googlePhotoUrl;
+        return;
+      }
+      
+      // If no Google photo, get profile URL from our centralized manager
+      const photoUrl = preloadProfilePicture('teacher');
       
       // Update the user data with the photo URL
       setUserData(prevData => ({
@@ -169,6 +204,15 @@ const TeacherDashboard = () => {
         <header className="bg-white shadow-sm h-16 flex items-center px-6">
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
+            <button 
+              className="text-indigo-600 hover:text-indigo-800 relative transition-colors duration-150"
+              onClick={() => setActiveTab('settings')}
+              title="Language Settings"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+              </svg>
+            </button>
             <button className="text-indigo-600 hover:text-indigo-800 relative transition-colors duration-150">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
@@ -186,6 +230,8 @@ const TeacherDashboard = () => {
                     src={userData.photoURL} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     onError={(e) => {
                       // Use enhanced error handler
                       e.target.src = handleProfilePictureError(e, 'teacher');

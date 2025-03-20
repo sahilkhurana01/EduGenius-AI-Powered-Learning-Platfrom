@@ -70,61 +70,66 @@ function App() {
   }, []);
 
   return (
-    <AnimatePresence mode="wait" initial={true}>
-      {loading ? (
-        <Loading key="loading" />
-      ) : (
-        <Router key="router">
-          <Routes>
-            {/* Default route is now the LandingPage */}
-            <Route path="/" element={<LandingPage />} />
-            
-            {/* Role selection is now a separate route */}
-            <Route path="/role-selection" element={<RoleSelectionPage />} />
-            
-            <Route path="/login" element={<Login />} />
-            <Route 
-              path="/teacher-dashboard" 
-              element={<ProtectedRoute element={<TeacherDashboard />} allowedRole="teacher" />} 
-            />
-            <Route 
-              path="/student-dashboard" 
-              element={<ProtectedRoute element={<StudentDashboard />} allowedRole="student" />} 
-            />
-            {/* Ask AI route */}
-            <Route 
-              path="/ask-ai" 
-              element={
-                <ProtectedRoute 
-                  element={<GeminiWrapper userRole={sessionStorage.getItem('userRole')} />} 
-                  allowedRole={null} 
-                />
-              } 
-            />
-            {/* Generic dashboard route that redirects based on role */}
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute 
-                  element={
-                    (() => {
-                      const userRole = sessionStorage.getItem('userRole');
-                      return userRole === 'student' 
-                        ? <Navigate to="/student-dashboard" /> 
-                        : <Navigate to="/teacher-dashboard" />;
-                    })()
-                  } 
-                />
-              } 
-            />
-            {/* Add debug route for session testing */}
-            <Route path="/debug" element={<SessionDebug />} />
-            {/* Catch-all route for 404 */}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Router>
-      )}
-    </AnimatePresence>
+    <>
+      {/* Hidden Google Translate element */}
+      <div id="google_translate_element" style={{ display: 'none' }}></div>
+      
+      <AnimatePresence mode="wait" initial={true}>
+        {loading ? (
+          <Loading key="loading" />
+        ) : (
+          <Router key="router">
+            <Routes>
+              {/* Default route is now the LandingPage */}
+              <Route path="/" element={<LandingPage />} />
+              
+              {/* Role selection is now a separate route */}
+              <Route path="/role-selection" element={<RoleSelectionPage />} />
+              
+              <Route path="/login" element={<Login />} />
+              <Route 
+                path="/teacher-dashboard" 
+                element={<ProtectedRoute element={<TeacherDashboard />} allowedRole="teacher" />} 
+              />
+              <Route 
+                path="/student-dashboard" 
+                element={<ProtectedRoute element={<StudentDashboard />} allowedRole="student" />} 
+              />
+              {/* Ask AI route */}
+              <Route 
+                path="/ask-ai" 
+                element={
+                  <ProtectedRoute 
+                    element={<GeminiWrapper userRole={sessionStorage.getItem('userRole')} />} 
+                    allowedRole={null} 
+                  />
+                } 
+              />
+              {/* Generic dashboard route that redirects based on role */}
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute 
+                    element={
+                      (() => {
+                        const userRole = sessionStorage.getItem('userRole');
+                        return userRole === 'student' 
+                          ? <Navigate to="/student-dashboard" /> 
+                          : <Navigate to="/teacher-dashboard" />;
+                      })()
+                    } 
+                  />
+                } 
+              />
+              {/* Add debug route for session testing */}
+              <Route path="/debug" element={<SessionDebug />} />
+              {/* Catch-all route for 404 */}
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </Router>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import LanguageSettings from './LanguageSettings';
 
 const CourseSettings = () => {
   const [activeTab, setActiveTab] = useState('general');
-
-  // Mock course data
-  const courseData = {
+  
+  // State for form controls
+  const [courseData, setCourseData] = useState({
     name: 'Advanced Mathematics',
     description: 'A comprehensive course covering algebra, calculus, and trigonometry for high school students.',
     startDate: '2023-09-01',
@@ -17,15 +18,63 @@ const CourseSettings = () => {
     enableDiscussions: true,
     enablePeerReviews: false,
     notifyOnSubmission: true
-  };
+  });
 
   // Mock completion settings
-  const completionSettings = [
+  const [completionSettings, setCompletionSettings] = useState([
     { id: 1, name: 'Assignments', required: true, minCount: 8, minScore: 70 },
     { id: 2, name: 'Quizzes', required: true, minCount: 5, minScore: 75 },
     { id: 3, name: 'Final Exam', required: true, minCount: 1, minScore: 65 },
     { id: 4, name: 'Discussion Participation', required: false, minCount: 10, minScore: 0 }
-  ];
+  ]);
+
+  // Handle changes to form inputs
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCourseData({
+      ...courseData,
+      [name]: type === 'checkbox' ? checked : value
+    });
+  };
+
+  // Handle changes to completion settings
+  const handleCompletionChange = (id, field, value) => {
+    setCompletionSettings(
+      completionSettings.map(item => 
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  // Save changes based on active tab
+  const handleSaveChanges = () => {
+    try {
+      switch (activeTab) {
+        case 'general':
+          console.log('Saving general settings:', courseData);
+          // Here you would save the course data to your backend
+          // For now, just show a success message
+          alert('General settings saved successfully!');
+          break;
+        case 'completion':
+          console.log('Saving completion requirements:', completionSettings);
+          // Here you would save the completion settings to your backend
+          // For now, just show a success message
+          alert('Completion requirements saved successfully!');
+          break;
+        case 'language':
+          // Language settings are saved directly in the LanguageSettings component
+          // This is just a fallback
+          console.log('Language settings saved through CourseSettings');
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Failed to save settings. Please try again.');
+    }
+  };
 
   const renderSettings = () => {
     switch (activeTab) {
@@ -40,7 +89,9 @@ const CourseSettings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Course Name</label>
                     <input 
                       type="text" 
+                      name="name"
                       value={courseData.name} 
+                      onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                     />
                   </div>
@@ -48,13 +99,20 @@ const CourseSettings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                     <input 
                       type="date" 
+                      name="startDate"
                       value={courseData.startDate} 
+                      onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Enrollment Status</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select 
+                      name="enrollmentStatus"
+                      value={courseData.enrollmentStatus}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
                       <option>Open</option>
                       <option>Closed</option>
                       <option>Invite Only</option>
@@ -64,7 +122,9 @@ const CourseSettings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Maximum Students</label>
                     <input 
                       type="number" 
+                      name="maxStudents"
                       value={courseData.maxStudents} 
+                      onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                     />
                   </div>
@@ -74,20 +134,30 @@ const CourseSettings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Course Description</label>
                     <textarea 
                       rows="3"
+                      name="description"
+                      value={courseData.description}
+                      onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    >{courseData.description}</textarea>
+                    ></textarea>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
                     <input 
                       type="date" 
+                      name="endDate"
                       value={courseData.endDate} 
+                      onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <select 
+                      name="visibility"
+                      value={courseData.visibility}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
                       <option>Public</option>
                       <option>Private</option>
                     </select>
@@ -96,7 +166,9 @@ const CourseSettings = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Passing Grade (%)</label>
                     <input 
                       type="number" 
+                      name="passingGrade"
                       value={courseData.passingGrade} 
+                      onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                     />
                   </div>
@@ -111,7 +183,9 @@ const CourseSettings = () => {
                   <div className="flex items-center h-5">
                     <input 
                       type="checkbox" 
+                      name="allowLateSubmissions"
                       checked={courseData.allowLateSubmissions} 
+                      onChange={handleInputChange}
                       className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                   </div>
@@ -124,7 +198,9 @@ const CourseSettings = () => {
                   <div className="flex items-center h-5">
                     <input 
                       type="checkbox" 
+                      name="enableDiscussions"
                       checked={courseData.enableDiscussions} 
+                      onChange={handleInputChange}
                       className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                   </div>
@@ -137,7 +213,9 @@ const CourseSettings = () => {
                   <div className="flex items-center h-5">
                     <input 
                       type="checkbox" 
+                      name="enablePeerReviews"
                       checked={courseData.enablePeerReviews} 
+                      onChange={handleInputChange}
                       className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                   </div>
@@ -150,7 +228,9 @@ const CourseSettings = () => {
                   <div className="flex items-center h-5">
                     <input 
                       type="checkbox" 
+                      name="notifyOnSubmission"
                       checked={courseData.notifyOnSubmission} 
+                      onChange={handleInputChange}
                       className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                   </div>
@@ -190,6 +270,7 @@ const CourseSettings = () => {
                           <input 
                             type="checkbox" 
                             checked={item.required} 
+                            onChange={(e) => handleCompletionChange(item.id, 'required', e.target.checked)}
                             className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                           />
                         </div>
@@ -198,6 +279,7 @@ const CourseSettings = () => {
                         <input 
                           type="number" 
                           value={item.minCount} 
+                          onChange={(e) => handleCompletionChange(item.id, 'minCount', parseInt(e.target.value))}
                           className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </td>
@@ -205,6 +287,7 @@ const CourseSettings = () => {
                         <input 
                           type="number" 
                           value={item.minScore} 
+                          onChange={(e) => handleCompletionChange(item.id, 'minScore', parseInt(e.target.value))}
                           className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </td>
@@ -227,6 +310,8 @@ const CourseSettings = () => {
             </div>
           </div>
         );
+      case 'language':
+        return <LanguageSettings />;
       default:
         return null;
     }
@@ -235,7 +320,7 @@ const CourseSettings = () => {
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
       <div className="border-b border-gray-100">
-        <div className="flex items-center px-1 py-1">
+        <div className="flex flex-wrap items-center px-1 py-1">
           <button
             onClick={() => setActiveTab('general')}
             className={`px-5 py-3 text-sm font-medium rounded-lg ${
@@ -256,9 +341,18 @@ const CourseSettings = () => {
           >
             Completion Requirements
           </button>
+          <button
+            onClick={() => setActiveTab('language')}
+            className={`px-5 py-3 text-sm font-medium rounded-lg ${
+              activeTab === 'language'
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            Language Settings
+          </button>
         </div>
       </div>
-      
       <div className="p-6">
         {renderSettings()}
       </div>
@@ -267,7 +361,10 @@ const CourseSettings = () => {
         <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
           Cancel
         </button>
-        <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <button 
+          onClick={handleSaveChanges}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
           Save Changes
         </button>
       </div>

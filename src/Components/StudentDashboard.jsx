@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { preloadProfilePicture, handleProfilePictureError, handleLogout } from '../utils/ProfilePictureManager';
+import { initializeGoogleTranslate } from '../utils/LanguageService';
 import RecentActivity from './dashboard/RecentActivity';
 import ResourceLibrary from './dashboard/ResourceLibrary';
 import MyCourses from './dashboard/MyCourses';
@@ -47,6 +48,9 @@ const StudentDashboard = () => {
       
       // Load profile picture using enhanced management
       loadProfilePicture();
+      
+      // Initialize Google Translate
+      initializeGoogleTranslate();
     }
   }, [navigate]);
 
@@ -57,8 +61,39 @@ const StudentDashboard = () => {
       // Check first if we have a Google photo URL (highest priority)
       const googlePhotoUrl = sessionStorage.getItem('googlePhotoURL');
       
-      // Get profile URL from our centralized manager
-      const photoUrl = googlePhotoUrl || preloadProfilePicture('student');
+      if (googlePhotoUrl) {
+        console.log('Using Google profile picture in StudentDashboard:', googlePhotoUrl);
+        
+        // Pre-validate the image before displaying
+        const img = new Image();
+        img.onload = () => {
+          console.log('Google profile picture validated successfully');
+          // Directly update UI with Google photo
+          setUserData(prevData => ({
+            ...prevData,
+            photoURL: googlePhotoUrl
+          }));
+          setProfilePictureLoading(false);
+        };
+        
+        img.onerror = () => {
+          console.warn('Google profile picture failed validation, falling back to default');
+          // Fallback to default or cached profile picture
+          const photoUrl = preloadProfilePicture('student');
+          setUserData(prevData => ({
+            ...prevData,
+            photoURL: photoUrl
+          }));
+          setProfilePictureLoading(false);
+        };
+        
+        // Start loading the image
+        img.src = googlePhotoUrl;
+        return;
+      }
+      
+      // If no Google photo, get profile URL from our centralized manager
+      const photoUrl = preloadProfilePicture('student');
       
       // Update the user data with the photo URL
       setUserData(prevData => ({
@@ -199,6 +234,15 @@ const StudentDashboard = () => {
         <header className="bg-white shadow-sm h-16 flex items-center px-6">
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
+            <button 
+              className="text-indigo-600 hover:text-indigo-800 relative transition-colors duration-150"
+              onClick={() => setActiveTab('settings')}
+              title="Language Settings"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+              </svg>
+            </button>
             <button className="text-indigo-600 hover:text-indigo-800 relative transition-colors duration-150">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
@@ -216,6 +260,8 @@ const StudentDashboard = () => {
                     src={userData.photoURL} 
                     alt="Profile" 
                     className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     onError={(e) => {
                       e.target.src = handleProfilePictureError(e, 'student');
                     }}
@@ -266,6 +312,100 @@ const StudentDashboard = () => {
           </div>
           
           {renderContent()}
+
+          {/* Dashboard View */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6">
+              <StatCards stats={dashboardStats} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-lg font-medium text-indigo-800 mb-4">My Learning Progress</h2>
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700">Mathematics - Algebra</span>
+                      <span className="text-sm font-medium text-indigo-600">85%</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full">
+                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '85%' }}></div>
+                    </div>
+                    
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700">Physics - Mechanics</span>
+                      <span className="text-sm font-medium text-indigo-600">62%</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full">
+                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '62%' }}></div>
+                    </div>
+                    
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-700">Literature - Modern Fiction</span>
+                      <span className="text-sm font-medium text-indigo-600">78%</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full">
+                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '78%' }}></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Recent Activity</h2>
+                  <RecentActivity />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-lg font-medium text-indigo-800 mb-4">My Courses</h2>
+                  <MyCourses />
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
+                  <ResourceLibrary />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Lessons Tab */}
+          {activeTab === 'courses' && (
+            <div className="transition-opacity duration-300">
+              <MyCourses />
+            </div>
+          )}
+
+          {/* Resources Tab */}
+          {activeTab === 'resources' && (
+            <div className="transition-opacity duration-300">
+              <ResourceLibrary />
+            </div>
+          )}
+
+          {/* Calendar Tab */}
+          {activeTab === 'calendar' && (
+            <div className="transition-opacity duration-300">
+              <CalendarTab />
+            </div>
+          )}
+
+          {/* Messages Tab */}
+          {activeTab === 'messages' && (
+            <div className="transition-opacity duration-300">
+              <MessagesTab />
+            </div>
+          )}
+
+          {/* Help & Support Tab */}
+          {activeTab === 'help' && (
+            <div className="transition-opacity duration-300">
+              <HelpSupport />
+            </div>
+          )}
+
+          {/* Settings Tab */}
+          {activeTab === 'settings' && (
+            <div className="transition-opacity duration-300">
+              <CourseSettings />
+            </div>
+          )}
+
         </main>
       </div>
     </div>

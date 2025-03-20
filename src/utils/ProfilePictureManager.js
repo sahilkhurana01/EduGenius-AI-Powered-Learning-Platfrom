@@ -4,12 +4,45 @@
  * Similar to systems used by Netflix, Google, and Microsoft
  */
 
+import { clearLanguagePreference } from './LanguageService';
+
 // Store profile data in localStorage with versioning
 const STORAGE_KEY = 'edugenius_profile_data';
 const VERSION = '1.0';
 
 // Cache timeout (24 hours in milliseconds)
 const CACHE_TIMEOUT = 24 * 60 * 60 * 1000;
+
+/**
+ * Prepares a Google profile picture URL to avoid CORS and size issues
+ * @param {string} url - Original Google profile picture URL
+ * @returns {string} - Modified URL for better compatibility
+ */
+const prepareGooglePhotoUrl = (url) => {
+  if (!url) return url;
+  
+  try {
+    // Google profile URLs often end with =s96-c or similar size constraints
+    // Remove the size constraint to get full resolution
+    if (url.includes('googleusercontent.com')) {
+      // For newer Google photo URLs (lh3.googleusercontent.com format)
+      if (url.includes('=s')) {
+        // Replace size restriction with a larger one
+        return url.replace(/=s\d+-c$/, '=s400-c');
+      }
+      
+      // For other Google photo URLs, ensure we're using https
+      if (url.startsWith('http:')) {
+        return url.replace('http:', 'https:');
+      }
+    }
+    
+    return url;
+  } catch (error) {
+    console.error('Error preparing Google photo URL:', error);
+    return url;
+  }
+};
 
 /**
  * Saves a profile picture URL to localStorage with metadata
@@ -25,11 +58,25 @@ export const saveProfilePicture = (url, userRole = sessionStorage.getItem('userR
   }
 
   try {
-    // If this is a Google photo, ensure we mark it as such
+    // If this is a Google photo, ensure we mark it as such and optimize the URL
     if (url.includes('googleusercontent.com') || isGooglePhoto) {
       console.log('Detected Google profile picture, prioritizing it');
-      sessionStorage.setItem('googlePhotoURL', url);
+      
+      // Prepare the URL for better compatibility
+      const optimizedUrl = prepareGooglePhotoUrl(url);
+      console.log('Original URL:', url);
+      console.log('Optimized URL:', optimizedUrl);
+      
+      // Store both the original and optimized URLs
+      sessionStorage.setItem('googlePhotoURL', optimizedUrl);
+      sessionStorage.setItem('originalGooglePhotoURL', url);
       isGooglePhoto = true;
+      
+      // Also store it as the primary photo URL
+      sessionStorage.setItem('userPhotoURL', optimizedUrl);
+      
+      // Update the URL for storage
+      url = optimizedUrl;
     }
 
     const timestamp = Date.now();
@@ -46,8 +93,10 @@ export const saveProfilePicture = (url, userRole = sessionStorage.getItem('userR
     // Save back to localStorage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profileData));
     
-    // Also save to session storage for immediate access
-    sessionStorage.setItem('userPhotoURL', url);
+    // Also save to session storage for immediate access if not already saved
+    if (!sessionStorage.getItem('userPhotoURL')) {
+      sessionStorage.setItem('userPhotoURL', url);
+    }
     
     console.log(`Profile picture saved for ${userRole}${isGooglePhoto ? ' (Google photo)' : ''}`);
     return true;
@@ -134,39 +183,44 @@ const getProfileData = () => {
  * @returns {string} - The profile picture URL (cached or new)
  */
 export const preloadProfilePicture = (userRole) => {
-  // First check if we have a Google photo URL (highest priority)
-  const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
-  if (googlePhotoURL) {
-    // If we have a Google photo URL, use it and also update our cache
-    console.log('Using Google profile picture for', userRole);
-    saveProfilePicture(googlePhotoURL, userRole, true);
-    return googlePhotoURL;
+  try {
+    // First check if we have a Google photo URL (highest priority)
+    const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
+    if (googlePhotoURL) {
+      // If we have a Google photo URL, use it and also update our cache
+      console.log('Using Google profile picture for', userRole);
+      saveProfilePicture(googlePhotoURL, userRole, true);
+      return googlePhotoURL;
+    }
+    
+    // Next try to get from session storage
+    const sessionPhotoUrl = sessionStorage.getItem('userPhotoURL');
+    
+    // Then check our localStorage cache
+    const cachedUrl = getProfilePictureUrl(userRole);
+    
+    // Determine which URL to use
+    let photoUrl = sessionPhotoUrl;
+    
+    // If session has no photo but we have a cached one, use cached
+    if (!photoUrl && cachedUrl) {
+      photoUrl = cachedUrl;
+      // Store in session for faster access
+      sessionStorage.setItem('userPhotoURL', photoUrl);
+      console.log('Using cached profile picture');
+    }
+    
+    // If we have a new session photo different from cache, update cache
+    if (photoUrl && (!cachedUrl || photoUrl !== cachedUrl)) {
+      saveProfilePicture(photoUrl, userRole);
+      console.log('Updated cached profile picture');
+    }
+    
+    return photoUrl || getDefaultProfilePicture(userRole);
+  } catch (error) {
+    console.error('Error in preloadProfilePicture:', error);
+    return getDefaultProfilePicture(userRole);
   }
-  
-  // Next try to get from session storage
-  const sessionPhotoUrl = sessionStorage.getItem('userPhotoURL');
-  
-  // Then check our localStorage cache
-  const cachedUrl = getProfilePictureUrl(userRole);
-  
-  // Determine which URL to use
-  let photoUrl = sessionPhotoUrl;
-  
-  // If session has no photo but we have a cached one, use cached
-  if (!photoUrl && cachedUrl) {
-    photoUrl = cachedUrl;
-    // Store in session for faster access
-    sessionStorage.setItem('userPhotoURL', photoUrl);
-    console.log('Using cached profile picture');
-  }
-  
-  // If we have a new session photo different from cache, update cache
-  if (photoUrl && (!cachedUrl || photoUrl !== cachedUrl)) {
-    saveProfilePicture(photoUrl, userRole);
-    console.log('Updated cached profile picture');
-  }
-  
-  return photoUrl || getDefaultProfilePicture(userRole);
 };
 
 /**
@@ -183,13 +237,10 @@ export const handleProfilePictureError = (event, userRole) => {
     event.target.onerror = null;
   }
   
-  const userName = sessionStorage.getItem('userName') || 'User';
-  
-  // Try multiple fallback options in sequence
+  // Try role-specific defaults without external dependencies
+  // Avoid UI Avatars due to CORS issues
   const fallbackOptions = [
-    // First try a generated avatar based on user name
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=4f46e5&color=ffffff`,
-    // Then try role-specific defaults
+    // Role-specific defaults that won't have CORS issues
     getDefaultProfilePicture(userRole),
     // Final fallback is a static image
     '/assets/default-avatar.png'
@@ -218,17 +269,13 @@ export const handleProfilePictureError = (event, userRole) => {
  * @returns {string} - The default profile picture URL
  */
 const getDefaultProfilePicture = (userRole) => {
-  // Role-specific defaults that won't have CORS issues
-  switch (userRole) {
-    case 'teacher':
-      return 'https://randomuser.me/api/portraits/women/44.jpg';
-    case 'student':
-      return 'https://randomuser.me/api/portraits/men/32.jpg';
-    case 'admin':
-      return 'https://randomuser.me/api/portraits/men/68.jpg';
-    default:
-      return 'https://randomuser.me/api/portraits/lego/1.jpg';
-  }
+  // Base64 encoded simple avatar for all users
+  // This is a simple gray avatar to avoid external dependencies and CORS issues
+  const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyMCIgZmlsbD0iI2U5ZWJlZSIgLz48cGF0aCBkPSJNMTI4LDEzNmM1My4wMiwwIDk2LDQyLjk4LDk2LDk2djEySDMyVjIzMmMwLTUzLjAyLDQyLjk4LTk2LDk2LTk2Wm0wLTExMmMxOS44OCwwLDM2LDE2LjEyLDM2LDM2czAtNzIsLTM2LTcyLTM2LDUyLjEyLTM2LDcyLDE2LjEyLDM2LDM2LDM2WiIgZmlsbD0iI2U2ZTZlNiIgLz48L3N2Zz4=';
+  
+  // Return the same default avatar for all roles
+  // This is more reliable than trying to use external files
+  return defaultAvatar;
 };
 
 /**
@@ -239,6 +286,7 @@ export const clearProfilePictureData = () => {
     // Clear session storage items
     sessionStorage.removeItem('userPhotoURL');
     sessionStorage.removeItem('googlePhotoURL');
+    sessionStorage.removeItem('originalGooglePhotoURL');
     
     // Keep the data structure but clear URLs
     const profileData = getProfileData();
@@ -265,9 +313,14 @@ export const handleLogout = (navigate) => {
   sessionStorage.removeItem('userEmail');
   sessionStorage.removeItem('userPhotoURL');
   sessionStorage.removeItem('googlePhotoURL');
+  sessionStorage.removeItem('originalGooglePhotoURL');
+  sessionStorage.removeItem('userId');
   
   // Clear profile picture cache
   clearProfilePictureData();
+  
+  // Reset language to default (English)
+  clearLanguagePreference();
   
   // Redirect to login page
   if (navigate) {
