@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const Leaderboard = ({ compact = true }) => {
+const Leaderboard = ({ compact = true, userData }) => {
   const [activeClass] = useState('Class 10th'); // Fixed to Class 10th only
   const [searchTerm, setSearchTerm] = useState('');
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // Mock data for the leaderboard
-  const allStudentsData = [
+  // Mock data for fallback
+  const mockData = [
     { id: 1, name: 'Sarah Parker', score: 980, avatar: 'https://randomuser.me/api/portraits/women/44.jpg', class: 'Class 10th' },
-    { id: 2, name: 'Alex Johnson', score: 945, avatar: 'https://randomuser.me/api/portraits/men/32.jpg', isCurrentUser: true, class: 'Class 10th' },
     { id: 3, name: 'Michael Chen', score: 920, avatar: 'https://randomuser.me/api/portraits/men/67.jpg', class: 'Class 10th' },
     { id: 4, name: 'Emma Wilson', score: 890, avatar: 'https://randomuser.me/api/portraits/women/63.jpg', class: 'Class 10th' },
     { id: 5, name: 'David Kim', score: 875, avatar: 'https://randomuser.me/api/portraits/men/91.jpg', class: 'Class 10th' },
@@ -18,9 +20,66 @@ const Leaderboard = ({ compact = true }) => {
     { id: 10, name: 'Sophia Davis', score: 820, avatar: 'https://randomuser.me/api/portraits/women/28.jpg', class: 'Class 10th' },
   ];
 
-  // Filter students based on active class and search term
-  const filteredStudents = allStudentsData
-    .filter(student => student.class === activeClass)
+  // Fetch leaderboard data
+  const fetchLeaderboardData = () => {
+    setIsLoading(true);
+    try {
+      // For now, we'll use mock data directly since the API isn't set up
+      // In a real app, you would make an API call here
+      setTimeout(() => {
+        arrangeLeaderboardWithCurrentUser(mockData);
+        setError(null);
+        setIsLoading(false);
+      }, 500); // Simulate API delay
+    } catch (err) {
+      console.error('Error fetching leaderboard data:', err);
+      setError('Failed to load leaderboard data');
+      arrangeLeaderboardWithCurrentUser(mockData);
+      setIsLoading(false);
+    }
+  };
+
+  // Arrange leaderboard to place current user at second position
+  const arrangeLeaderboardWithCurrentUser = (data) => {
+    try {
+      // Create current user object based on userData from StudentDashboard
+      const currentUserData = {
+        id: userData?.id || 'current-user',
+        name: userData?.name || 'Alex Johnson',
+        score: 945, // Fixed score for second position
+        avatar: userData?.photoURL || 'https://randomuser.me/api/portraits/men/32.jpg', // Use photoURL from userData
+        class: 'Class 10th',
+        isCurrentUser: true
+      };
+      
+      if (!data || data.length === 0) {
+        data = [...mockData]; // Ensure we have data
+      }
+      
+      // Insert current user at second position
+      const result = [data[0]]; // First position remains unchanged
+      result.push(currentUserData); // Add current user at second position
+      
+      // Add remaining students (skipping any that might have same ID as current user)
+      const remainingStudents = data.slice(1).filter(student => student.id !== currentUserData.id);
+      result.push(...remainingStudents);
+      
+      setLeaderboardData(result);
+    } catch (error) {
+      console.error("Error arranging leaderboard data:", error);
+      setLeaderboardData(mockData); // Fallback to mock data on error
+    }
+  };
+
+  // Fetch data when component mounts
+  useEffect(() => {
+    fetchLeaderboardData();
+    // Deliberately not including userData in dependencies to prevent re-fetching
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Filter students based on search term
+  const filteredStudents = leaderboardData
     .filter(student => 
       searchTerm ? student.name.toLowerCase().includes(searchTerm.toLowerCase()) : true
     );
@@ -98,6 +157,35 @@ const Leaderboard = ({ compact = true }) => {
     }
   };
 
+  // Loading state
+  if (isLoading && leaderboardData.length === 0) {
+    return (
+      <div className={`${compact ? 'bg-white rounded-lg shadow-sm p-4' : 'h-full'} flex items-center justify-center`}>
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-indigo-600 font-medium">Loading leaderboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error && leaderboardData.length === 0) {
+    return (
+      <div className={`${compact ? 'bg-white rounded-lg shadow-sm p-4' : 'h-full'} flex items-center justify-center`}>
+        <div className="bg-red-50 p-4 rounded-lg text-center">
+          <p className="text-red-600 mb-2">Failed to load leaderboard data</p>
+          <button 
+            onClick={fetchLeaderboardData}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`${compact ? 'bg-white rounded-lg shadow-sm p-4' : 'h-full bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5'}`}>
       {/* Header */}
@@ -131,7 +219,7 @@ const Leaderboard = ({ compact = true }) => {
       </div>
 
       {/* Podium for top 3 students (only in full view) */}
-      {!compact && (
+      {!compact && displayStudents.length >= 3 && (
         <div className="relative flex justify-center items-end h-48 mb-12 px-8">
           {/* Second place */}
           <div className="w-1/4 z-10">
@@ -143,12 +231,15 @@ const Leaderboard = ({ compact = true }) => {
                     alt={displayStudents[1]?.name} 
                     className="h-full w-full object-cover"
                     onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[1]?.name);
+                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[1]?.name || 'User');
                     }}
                   />
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-blue-400 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-md">
                   2
+                </div>
+                <div className="absolute -top-1 -left-1 bg-indigo-100 text-indigo-600 text-xs font-bold rounded-full px-1.5 py-0.5 shadow-sm border border-indigo-200">
+                  You
                 </div>
               </div>
               <p className="text-sm font-semibold text-blue-700 mb-2 text-center">{displayStudents[1]?.name.split(' ')[0]}</p>
@@ -172,7 +263,7 @@ const Leaderboard = ({ compact = true }) => {
                     alt={displayStudents[0]?.name} 
                     className="h-full w-full object-cover"
                     onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[0]?.name);
+                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[0]?.name || 'User');
                     }}
                   />
                 </div>
@@ -197,7 +288,7 @@ const Leaderboard = ({ compact = true }) => {
                     alt={displayStudents[2]?.name} 
                     className="h-full w-full object-cover"
                     onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[2]?.name);
+                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[2]?.name || 'User');
                     }}
                   />
                 </div>
@@ -224,6 +315,12 @@ const Leaderboard = ({ compact = true }) => {
       
       {/* Leaderboard list */}
       <div className={`${compact ? 'space-y-3' : 'space-y-3 bg-white rounded-lg shadow-md p-6'}`}>
+        {isLoading && displayStudents.length > 0 && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10 rounded-lg">
+            <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+        
         {/* Skip top 3 in full view since we have the podium */}
         {(compact ? displayStudents : displayStudents.slice(3)).map((student, index) => {
           const position = compact ? index + 1 : index + 4;
@@ -231,7 +328,7 @@ const Leaderboard = ({ compact = true }) => {
           
           return (
             <div 
-              key={student.id}
+              key={student.id || index}
               className={`flex items-center ${compact ? 'p-2' : 'p-3'} rounded-lg ${getBgColor(position, isCurrentUser)} transition-all duration-200`}
             >
               <div className="flex items-center justify-center w-10 h-10 mr-2">
@@ -244,7 +341,7 @@ const Leaderboard = ({ compact = true }) => {
                   alt={student.name} 
                   className="h-full w-full object-cover"
                   onError={(e) => {
-                    e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(student.name);
+                    e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(student.name || 'User');
                   }}
                 />
               </div>
@@ -310,7 +407,7 @@ const Leaderboard = ({ compact = true }) => {
       )}
       
       {/* Empty state */}
-      {!compact && displayStudents.length === 0 && (
+      {!compact && displayStudents.length === 0 && !isLoading && (
         <div className="py-12 text-center bg-white rounded-lg shadow-sm">
           <div className="mx-auto w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mb-4">
             <span className="text-2xl font-bold text-indigo-400">?</span>
