@@ -22,7 +22,8 @@ import {
   HelpCircle,
   LogOut,
   FileText,
-  Clock
+  Clock,
+  Trophy
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -31,6 +32,7 @@ const mainNavItems = [
   { title: "My Courses", icon: GraduationCap, url: "#courses" },
   { title: "Assignments", icon: FileText, url: "#assignments", badge: 3 },
   { title: "Schedule", icon: Clock, url: "#schedule" },
+  { title: "Leaderboard", icon: Trophy, url: "#leaderboard" },
   { title: "Resources", icon: BookOpen, url: "#resources", badge: "New" },
   { title: "Calendar", icon: CalendarDays, url: "#calendar" },
   { title: "Messages", icon: MessageSquare, url: "#messages", badge: 2 },
