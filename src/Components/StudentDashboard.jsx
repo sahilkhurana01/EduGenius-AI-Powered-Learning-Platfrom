@@ -13,7 +13,9 @@ import WeeklyActivity from './dashboard/WeeklyActivity';
 import HelpSupport from './dashboard/HelpSupport';
 import CourseSettings from './dashboard/CourseSettings';
 import DailyQuiz from './dashboard/DailyQuiz';
+import Leaderboard from './student/Leaderboard';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { Trophy } from 'lucide-react';
 
 const StudentDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -193,6 +195,12 @@ const StudentDashboard = () => {
         return <CourseSettings />;
       case 'daily-quiz':
         return <DailyQuiz />;
+      case 'leaderboard':
+        return (
+          <div className="h-full w-full">
+            <Leaderboard compact={false} userData={userData} />
+          </div>
+        );
       default:
         return null;
     }
@@ -239,6 +247,7 @@ const StudentDashboard = () => {
               navigate('/ask-ai');
             }} />
             <NavItem icon="resources" label="Resources" active={activeTab === 'resources'} collapsed={!sidebarOpen} onClick={() => setActiveTab('resources')} />
+            <NavItem icon="leaderboard" label="Leaderboard" active={activeTab === 'leaderboard'} collapsed={!sidebarOpen} onClick={() => setActiveTab('leaderboard')} />
             <NavItem icon="calendar" label="Calendar" active={activeTab === 'calendar'} collapsed={!sidebarOpen} onClick={() => setActiveTab('calendar')} />
             <NavItem icon="daily-quiz" label="Daily Quiz" active={activeTab === 'daily-quiz'} collapsed={!sidebarOpen} onClick={() => setActiveTab('daily-quiz')} />
             <NavItem icon="messages" label="Messages" active={activeTab === 'messages'} collapsed={!sidebarOpen} onClick={() => setActiveTab('messages')} />
@@ -362,10 +371,14 @@ const StudentDashboard = () => {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-semibold text-indigo-900">Student Dashboard</h1>
-            <p className="text-gray-500">Welcome back, {userData.name}. Here's what's happening with your courses today.</p>
+        <main className={`${activeTab === 'leaderboard' ? 'p-0' : 'p-6'}`}>
+          <div className={`${activeTab !== 'leaderboard' ? 'mb-6' : ''}`}>
+            {activeTab !== 'leaderboard' && (
+              <>
+                <h1 className="text-2xl font-semibold text-indigo-900">Student Dashboard</h1>
+                <p className="text-gray-500">Welcome back, {userData.name}. Here's what's happening with your courses today.</p>
+              </>
+            )}
           </div>
           
           {renderContent()}
@@ -480,6 +493,8 @@ const NavItem = ({ icon, label, active, collapsed, onClick }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
           </svg>
         );
+      case 'leaderboard':
+        return <Trophy className="h-5 w-5" />;
       case 'daily-quiz':
         return (
           <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
