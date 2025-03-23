@@ -6,6 +6,7 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(),  tailwindcss()],
+  base: "/EduGenius-AI-Powered-Learning-Platfrom",
   resolve: {
     alias: {
       // Add the same path aliases used in teaDash

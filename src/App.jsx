@@ -9,6 +9,7 @@ import SessionDebug from './Components/SessionDebug';
 import GeminiWrapper from './Components/Gemini/GeminiWrapper';
 import LandingPage from './Components/LandingPage/LandingPage';
 import Loading from './Components/Loading';
+import PWAInstallPrompt from './Components/PWAInstallPrompt';
 
 // Role-based Auth Guard component for protected routes
 const ProtectedRoute = ({ element, allowedRole }) => {
@@ -81,6 +82,9 @@ function App() {
     <>
       {/* Hidden Google Translate element */}
       <div id="google_translate_element" style={{ display: 'none' }}></div>
+      
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
       
       <AnimatePresence mode="wait" initial={true}>
         {loading ? (
