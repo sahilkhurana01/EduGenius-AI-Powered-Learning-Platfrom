@@ -24,6 +24,10 @@ const Leaderboard = ({ compact = true, userData }) => {
   const fetchLeaderboardData = () => {
     setIsLoading(true);
     try {
+      // Check for Google profile picture directly
+      const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
+      console.log("Fetching leaderboard with Google photo URL:", googlePhotoURL);
+      
       // For now, we'll use mock data directly since the API isn't set up
       // In a real app, you would make an API call here
       setTimeout(() => {
@@ -42,15 +46,21 @@ const Leaderboard = ({ compact = true, userData }) => {
   // Arrange leaderboard to place current user at second position
   const arrangeLeaderboardWithCurrentUser = (data) => {
     try {
+      // Get Google profile picture directly (highest priority)
+      const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
+      console.log("Arranging leaderboard with Google photo URL:", googlePhotoURL);
+      
       // Create current user object based on userData from StudentDashboard
       const currentUserData = {
         id: userData?.id || 'current-user',
         name: userData?.name || 'Alex Johnson',
         score: 945, // Fixed score for second position
-        avatar: userData?.photoURL || 'https://randomuser.me/api/portraits/men/32.jpg', // Use photoURL from userData
+        avatar: googlePhotoURL || userData?.photoURL || 'https://randomuser.me/api/portraits/men/32.jpg', // Use Google photo first, then userData photoURL, then fallback
         class: 'Class 10th',
         isCurrentUser: true
       };
+      
+      console.log("Current user avatar set to:", currentUserData.avatar);
       
       if (!data || data.length === 0) {
         data = [...mockData]; // Ensure we have data
@@ -73,10 +83,10 @@ const Leaderboard = ({ compact = true, userData }) => {
 
   // Fetch data when component mounts
   useEffect(() => {
+    console.log("Leaderboard received userData:", userData);
+    console.log("Google photo URL in sessionStorage:", sessionStorage.getItem('googlePhotoURL'));
     fetchLeaderboardData();
-    // Deliberately not including userData in dependencies to prevent re-fetching
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userData]); // Add userData as dependency to re-fetch when it changes
 
   // Filter students based on search term
   const filteredStudents = leaderboardData
@@ -227,9 +237,11 @@ const Leaderboard = ({ compact = true, userData }) => {
               <div className="relative mb-3">
                 <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-blue-300 shadow-lg">
                   <img 
-                    src={displayStudents[1]?.avatar} 
+                    src={sessionStorage.getItem('googlePhotoURL') || displayStudents[1]?.avatar} 
                     alt={displayStudents[1]?.name} 
                     className="h-full w-full object-cover"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     onError={(e) => {
                       e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[1]?.name || 'User');
                     }}
@@ -262,9 +274,6 @@ const Leaderboard = ({ compact = true, userData }) => {
                     src={displayStudents[0]?.avatar} 
                     alt={displayStudents[0]?.name} 
                     className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[0]?.name || 'User');
-                    }}
                   />
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-yellow-800 text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-md">
@@ -287,9 +296,6 @@ const Leaderboard = ({ compact = true, userData }) => {
                     src={displayStudents[2]?.avatar} 
                     alt={displayStudents[2]?.name} 
                     className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[2]?.name || 'User');
-                    }}
                   />
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-md">
@@ -335,14 +341,15 @@ const Leaderboard = ({ compact = true, userData }) => {
                 {getRankDisplay(position)}
               </div>
               
-              <div className={`h-10 w-10 rounded-full overflow-hidden ${compact ? 'ml-1' : 'ml-2'} ${isCurrentUser ? 'border-2 border-indigo-300' : ''}`}>
+              <div className={`h-10 w-10 rounded-full overflow-hidden relative ${compact ? 'ml-1' : 'ml-2'} ${isCurrentUser ? 'border-2 border-indigo-300' : ''}`}>
                 <img 
                   src={student.avatar} 
                   alt={student.name} 
                   className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(student.name || 'User');
-                  }}
+                  {...(isCurrentUser ? {
+                    referrerPolicy: "no-referrer",
+                    crossOrigin: "anonymous"
+                  } : {})}
                 />
               </div>
               

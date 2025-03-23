@@ -198,7 +198,11 @@ const StudentDashboard = () => {
       case 'leaderboard':
         return (
           <div className="h-full w-full">
-            <Leaderboard compact={false} userData={userData} />
+            <Leaderboard 
+              compact={false} 
+              userData={userData}
+              key={userData.photoURL}
+            />
           </div>
         );
       default:
