@@ -380,7 +380,7 @@ const AuthPage = () => {
                         transform: `translateX(${isLogin ? 0 : (!isMobile ? '100%' : 0)})`
                     }}>
                     <div className="mb-6 sm:mb-8">
-                        <img src=".\public/edugenius logo.png" alt="EduGenius Logo" className="h-6 sm:h-8 mb-4 sm:mb-6 invert" />
+                        <img src="/EduGenius-AI-Powered-Learning-Platfrom/edugenius logo.png" alt="EduGenius Logo" className="h-6 sm:h-8 mb-4 sm:mb-6 invert" />
                         <h2 className="text-xl sm:text-2xl font-bold mb-2">
                             {isLogin ? 'Welcome Back!' : 'Join EduGenius'}
                         </h2>

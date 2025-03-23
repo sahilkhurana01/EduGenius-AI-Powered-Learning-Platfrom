@@ -2,10 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/pwalogo.png" type="image/png" />
+    <link rel="icon" href="/EduGenius-AI-Powered-Learning-Platfrom/pwalogo.png" type="image/png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#4338CA" />
     <meta name="description" content="EduGenius - Educational Platform" />
+    
+    <!-- Security policies -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://*.firebaseapp.com https://*.googleapis.com; img-src 'self' data: blob: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseio.com https://apis.google.com https://*.firebaseapp.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com https://sahilkhurana01.github.io; frame-src 'self' https://*.firebaseapp.com;">
+    
     <title>EduGenius-AI Powered Learning Platform</title>
     
     <!-- PWA Meta Tags -->
@@ -17,13 +21,13 @@
     <meta name="format-detection" content="telephone=no" />
     
     <!-- PWA Icons -->
-    <link rel="apple-touch-icon" href="/pwalogo.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="/pwalogo.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/pwalogo.png" />
-    <link rel="apple-touch-icon" sizes="167x167" href="/pwalogo.png" />
+    <link rel="apple-touch-icon" href="/EduGenius-AI-Powered-Learning-Platfrom/pwalogo.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/EduGenius-AI-Powered-Learning-Platfrom/pwalogo.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/EduGenius-AI-Powered-Learning-Platfrom/pwalogo.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/EduGenius-AI-Powered-Learning-Platfrom/pwalogo.png" />
     
     <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/EduGenius-AI-Powered-Learning-Platfrom/manifest.json" />
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -39,7 +43,9 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
+          navigator.serviceWorker.register('/EduGenius-AI-Powered-Learning-Platfrom/sw.js', {
+            scope: '/EduGenius-AI-Powered-Learning-Platfrom/'
+          })
             .then(registration => {
               console.log('Service Worker registered with scope:', registration.scope);
             })

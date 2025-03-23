@@ -92,3 +92,15 @@ If you encounter issues:
 - File preview capability for supported document types
 - Version tracking for uploaded resources
 - Commenting and rating system for resources
+
+# Firebase Configuration
+
+To enable Google authentication for GitHub Pages deployment, you need to:
+
+1. Go to the [Firebase Console](https://console.firebase.google.com/)
+2. Select your project
+3. Navigate to **Authentication** > **Settings** > **Authorized domains**
+4. Add `sahilkhurana01.github.io` to the list of authorized domains
+5. Save your changes
+
+This will resolve the "Firebase: Error (auth/unauthorized-domain)" error when trying to sign in with Google.

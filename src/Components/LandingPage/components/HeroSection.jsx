@@ -144,7 +144,7 @@ const HeroSection = () => {
               <div className="relative mx-auto max-w-md">
                 <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-30"></div>
                 <img
-                  src="/kid.jpg"
+                  src="/EduGenius-AI-Powered-Learning-Platfrom/kid.jpg"
                   alt="Teenagers learning with EduGenius AI platform"
                   className="relative rounded-2xl shadow-xl object-cover h-[380px] w-[650px]"
                 />

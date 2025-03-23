@@ -9,7 +9,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build && node scripts/deploy-gh-pages.js",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
@@ -58,6 +58,7 @@
     "postcss": "^8.5.3",
     "sharp": "^0.33.5",
     "tailwindcss": "^4.0.12",
-    "vite": "^6.2.1"
+    "vite": "^6.2.1",
+    "vite-plugin-pwa": "^0.21.2"
   }
 }
