@@ -117,20 +117,23 @@ const AuthPage = () => {
         // If no role is set, default to student and go to role selection
         if (!userRole) {
             console.log('No user role found, redirecting to role selection');
-            navigate('/');
+            navigate('/role-selection');
             return;
         }
         
         console.log(`User authenticated with role: ${userRole}`);
         
-        // Navigate based on user role
+        // Navigate based on user role - ensure we're using the correct paths
         if (userRole === 'teacher') {
+            console.log('Navigating to teacher dashboard');
             navigate('/teacher-dashboard');
         } else if (userRole === 'student') {
+            console.log('Navigating to student dashboard');
             navigate('/student-dashboard');
         } else {
             // Unknown role, redirect to role selection
-            navigate('/');
+            console.log('Unknown role, redirecting to role selection');
+            navigate('/role-selection');
         }
     };
 
@@ -187,17 +190,23 @@ const AuthPage = () => {
             setLoading(true);
             setError('');
             
-            // Clear session storage first to prevent any conflicts
+            // Save the selected role first
+            const selectedRole = sessionStorage.getItem('userRole');
+            console.log('Current role before Google login:', selectedRole);
+            
+            // Clear session storage but keep the user role
+            const tempRole = sessionStorage.getItem('userRole');
             Object.keys(sessionStorage).forEach(key => {
                 sessionStorage.removeItem(key);
             });
+            // Restore the user role
+            if (tempRole) {
+                sessionStorage.setItem('userRole', tempRole);
+                console.log('Restored role after cleanup:', tempRole);
+            }
             
             // Then clear any existing profile data
             clearProfilePictureData();
-            
-            // Save user role first because we're going to need it
-            const selectedRole = sessionStorage.getItem('userRole') || 'student';
-            sessionStorage.setItem('userRole', selectedRole);
             
             const provider = new GoogleAuthProvider();
             // Request profile scope to ensure we get profile data
@@ -263,23 +272,30 @@ const AuthPage = () => {
 
     // Modified simulateGoogleLogin function
     const simulateGoogleLogin = () => {
-        // Clear session storage first to prevent any conflicts
+        // Save the user role first
+        const tempRole = sessionStorage.getItem('userRole');
+        console.log('Current role before simulated login:', tempRole);
+        
+        // Clear session storage but preserve the role
         Object.keys(sessionStorage).forEach(key => {
             sessionStorage.removeItem(key);
         });
         
+        // Restore the user role
+        if (tempRole) {
+            sessionStorage.setItem('userRole', tempRole);
+            console.log('Restored role after cleanup:', tempRole);
+        }
+        
         // Then clear any existing profile picture data
         clearProfilePictureData();
-        
-        // Save user role first because we're going to need it
-        const selectedRole = userRole || 'student';
-        sessionStorage.setItem('userRole', selectedRole);
         
         setLoading(true);
         
         // Simulate delay of API call
         setTimeout(() => {
             // Mock Google user data with the appropriate details
+            const selectedRole = sessionStorage.getItem('userRole') || 'student';
             const mockGoogleUser = {
                 displayName: selectedRole === 'teacher' ? 'Sahil Khurana' : 'Student User',
                 email: selectedRole === 'teacher' ? 'sahil.khurana@gmail.com' : 'student@example.com',

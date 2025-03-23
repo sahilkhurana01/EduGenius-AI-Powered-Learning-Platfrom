@@ -15,45 +15,6 @@
   <body>
     <div id="root"></div>
     
-    <!-- Google Translate Element -->
-    <div id="google_element"></div>
-    
-    <!-- Google Translate Script -->
-    <script src="https://translate.google.com/translate_a/element.js?cb=loadGoogleTranslate" async></script>
-    
-    <script>
-    function loadGoogleTranslate() {
-      try {
-        new google.translate.TranslateElement({
-          pageLanguage: 'en',
-          autoDisplay: false,
-          layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-        }, 'google_element');
-        console.log('Google Translate loaded successfully');
-        
-        // Apply saved language preference if exists
-        const savedLang = sessionStorage.getItem('language_preference');
-        if (savedLang && savedLang !== 'en') {
-          setTimeout(function() {
-            try {
-              // Find and trigger language change
-              const selectElement = document.querySelector('.goog-te-combo');
-              if (selectElement) {
-                selectElement.value = savedLang;
-                selectElement.dispatchEvent(new Event('change'));
-              }
-            } catch (e) {
-              console.warn('Could not apply saved language:', e);
-            }
-          }, 1000);
-        }
-      } catch (e) {
-        console.error('Error initializing Google Translate:', e);
-        sessionStorage.setItem('google_translate_blocked', 'true');
-      }
-    }
-    </script>
-    
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

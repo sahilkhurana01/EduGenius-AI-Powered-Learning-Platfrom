@@ -161,12 +161,12 @@ const StudentDashboard = () => {
     handleLogout(navigate);
   };
 
-  // Default stats for student dashboard
+  // Default stats for dashboard
   const dashboardStats = {
-    coursesCompleted: 5,
-    progress: 68,
-    quizAvg: 87,
-    nextExam: "May 15",
+    students: 245,
+    attendance: 92,
+    completion: 78,
+    avgTime: '4.5h'
   };
 
   const renderContent = () => {
