@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/EduGenius-AI-Powered-Learning-Platfrom/sw.js', { scope: '/EduGenius-AI-Powered-Learning-Platfrom/' })})}
