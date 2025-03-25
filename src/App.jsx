@@ -9,31 +9,40 @@ import SessionDebug from './Components/SessionDebug';
 import GeminiWrapper from './Components/Gemini/GeminiWrapper';
 import LandingPage from './Components/LandingPage/LandingPage';
 import Loading from './Components/Loading';
+import PWAInstallPrompt from './Components/PWAInstallPrompt';
 
 // Role-based Auth Guard component for protected routes
 const ProtectedRoute = ({ element, allowedRole }) => {
   const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
   const userRole = sessionStorage.getItem('userRole');
   
+  console.log('ProtectedRoute check:', { isAuthenticated, userRole, allowedRole });
+  
   // First check if user is authenticated
   if (!isAuthenticated) {
+    console.log('User not authenticated, redirecting to login');
     return <Navigate to="/login" />;
   }
   
   // Then check if user has the correct role for this route
   if (allowedRole && userRole !== allowedRole) {
+    console.log(`Role mismatch: user is ${userRole}, route requires ${allowedRole}`);
     // Redirect to the appropriate dashboard based on their role
     if (userRole === 'teacher') {
+      console.log('Redirecting to teacher dashboard');
       return <Navigate to="/teacher-dashboard" />;
     } else if (userRole === 'student') {
+      console.log('Redirecting to student dashboard');
       return <Navigate to="/student-dashboard" />;
     } else {
       // If role is invalid, redirect to role selection
+      console.log('Invalid role, redirecting to role selection');
       return <Navigate to="/role-selection" />;
     }
   }
   
   // If authenticated and has correct role, render the component
+  console.log('Role check passed, rendering component');
   return element;
 };
 
@@ -74,6 +83,9 @@ function App() {
       {/* Hidden Google Translate element */}
       <div id="google_translate_element" style={{ display: 'none' }}></div>
       
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
+      
       <AnimatePresence mode="wait" initial={true}>
         {loading ? (
           <Loading key="loading" />
@@ -113,9 +125,14 @@ function App() {
                     element={
                       (() => {
                         const userRole = sessionStorage.getItem('userRole');
-                        return userRole === 'student' 
-                          ? <Navigate to="/student-dashboard" /> 
-                          : <Navigate to="/teacher-dashboard" />;
+                        console.log('Dashboard route - detected role:', userRole);
+                        if (userRole === 'teacher') {
+                          console.log('Dashboard routing to teacher dashboard');
+                          return <Navigate to="/teacher-dashboard" />;
+                        } else {
+                          console.log('Dashboard routing to student dashboard');
+                          return <Navigate to="/student-dashboard" />;
+                        }
                       })()
                     } 
                   />

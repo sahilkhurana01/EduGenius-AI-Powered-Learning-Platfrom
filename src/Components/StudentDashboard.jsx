@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { preloadProfilePicture, handleProfilePictureError, handleLogout } from '../utils/ProfilePictureManager';
-import { initializeGoogleTranslate } from '../utils/LanguageService';
+import { initializeGoogleTranslate, supportedLanguages, getCurrentLanguage, applyGoogleTranslate } from '../utils/LanguageService';
 import RecentActivity from './dashboard/RecentActivity';
 import ResourceLibrary from './dashboard/ResourceLibrary';
 import MyCourses from './dashboard/MyCourses';
@@ -27,6 +27,9 @@ const StudentDashboard = () => {
   });
   const [profilePictureLoading, setProfilePictureLoading] = useState(true);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState(getCurrentLanguage());
+  const languageDropdownRef = useRef(null);
   const navigate = useNavigate();
 
   // Check if user is authenticated and is a student
@@ -124,17 +127,46 @@ const StudentDashboard = () => {
     setProfileMenuOpen(!profileMenuOpen);
   };
 
+  // Toggle language dropdown
+  const toggleLanguageMenu = (e) => {
+    e.stopPropagation();
+    setLanguageMenuOpen(!languageMenuOpen);
+  };
+  
+  // Handle language change
+  const handleLanguageChange = (langCode) => {
+    // Apply the language change
+    applyGoogleTranslate(langCode);
+    setCurrentLanguage(langCode);
+    // Close the dropdown
+    setLanguageMenuOpen(false);
+  };
+  
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (languageDropdownRef.current && !languageDropdownRef.current.contains(event.target)) {
+        setLanguageMenuOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [languageDropdownRef]);
+
   // Add missing logoutUser function
   const logoutUser = () => {
     handleLogout(navigate);
   };
 
-  // Default stats for student dashboard
+  // Default stats for dashboard
   const dashboardStats = {
-    coursesCompleted: 5,
-    progress: 68,
-    quizAvg: 87,
-    nextExam: "May 15",
+    students: 245,
+    attendance: 92,
+    completion: 78,
+    avgTime: '4.5h'
   };
 
   const renderContent = () => {
@@ -166,7 +198,11 @@ const StudentDashboard = () => {
       case 'leaderboard':
         return (
           <div className="h-full w-full">
-            <Leaderboard compact={false} userData={userData} />
+            <Leaderboard 
+              compact={false} 
+              userData={userData}
+              key={userData.photoURL}
+            />
           </div>
         );
       default:
@@ -243,15 +279,40 @@ const StudentDashboard = () => {
         <header className="bg-white shadow-sm h-16 flex items-center px-6">
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
-            <button 
-              className="text-indigo-600 hover:text-indigo-800 relative transition-colors duration-150"
-              onClick={() => setActiveTab('settings')}
-              title="Language Settings"
-            >
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-              </svg>
-            </button>
+            {/* Language Dropdown */}
+            <div className="relative" ref={languageDropdownRef}>
+              <button 
+                onClick={toggleLanguageMenu}
+                className="relative flex items-center text-gray-600 hover:text-indigo-600 transition-colors duration-150 focus:outline-none"
+                title="Language Settings"
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                </svg>
+                <span className="ml-1 text-xs font-medium">{currentLanguage.toUpperCase()}</span>
+              </button>
+              
+              {languageMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-20 py-1">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900">Select Language</p>
+                  </div>
+                  <div className="max-h-60 overflow-y-auto">
+                    {supportedLanguages.map((language) => (
+                      <button
+                        key={language.code}
+                        onClick={() => handleLanguageChange(language.code)}
+                        className={`w-full text-left block px-4 py-2 text-sm hover:bg-indigo-50 ${
+                          currentLanguage === language.code ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-gray-700'
+                        }`}
+                      >
+                        {language.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <button className="text-indigo-600 hover:text-indigo-800 relative transition-colors duration-150">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>

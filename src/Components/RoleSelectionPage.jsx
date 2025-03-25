@@ -15,12 +15,18 @@ const RoleSelectionPage = () => {
         // Save the selected role
         if (role === 'teacher') {
             setIsTeacher(true);
+            console.log('Teacher role selected');
         } else if (role === 'student') {
             setIsTeacher(false);
+            console.log('Student role selected');
         }
 
+        // Clear any existing role and data first
+        sessionStorage.clear();
+        
         // Store the role
         sessionStorage.setItem('userRole', role);
+        console.log('Role saved to sessionStorage:', role);
 
         // Redirect to login page using React Router
         navigate('/login');

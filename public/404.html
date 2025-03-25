@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>EduGenius - Redirecting</title>
+    <script>
+      // Single Page Apps for GitHub Pages
+      // Redirects from 404.html to the index.html with correct paths
+      // https://github.com/rafrex/spa-github-pages
+      var segmentCount = 0;
+      var l = window.location;
+      
+      // If accessing the root domain, redirect to the repo subdirectory
+      if (l.pathname === '/' || l.pathname === '') {
+        l.replace(
+          l.protocol + '//' + l.hostname + '/EduGenius-AI-Powered-Learning-Platfrom/'
+        );
+      } else {
+        // For other 404s, redirect to the index page in the repo subdirectory
+        l.replace(
+          l.protocol + '//' + l.hostname + '/EduGenius-AI-Powered-Learning-Platfrom/'
+        );
+      }
+    </script>
+  </head>
+  <body>
+    <h2>Redirecting to EduGenius...</h2>
+    <p>If you are not redirected automatically, click <a href="/EduGenius-AI-Powered-Learning-Platfrom/">here</a>.</p>
+  </body>
+</html> 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import LanguageSettings from './LanguageSettings';
 
 const CourseSettings = () => {
   const [activeTab, setActiveTab] = useState('general');
@@ -61,11 +60,6 @@ const CourseSettings = () => {
           // Here you would save the completion settings to your backend
           // For now, just show a success message
           alert('Completion requirements saved successfully!');
-          break;
-        case 'language':
-          // Language settings are saved directly in the LanguageSettings component
-          // This is just a fallback
-          console.log('Language settings saved through CourseSettings');
           break;
         default:
           break;
@@ -162,23 +156,31 @@ const CourseSettings = () => {
                       <option>Private</option>
                     </select>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Passing Grade (%)</label>
-                    <input 
-                      type="number" 
-                      name="passingGrade"
-                      value={courseData.passingGrade} 
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                    />
-                  </div>
                 </div>
               </div>
             </div>
             
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Course Features</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Course Options</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Passing Grade (%)</label>
+                  <input 
+                    type="number" 
+                    name="passingGrade"
+                    min="0"
+                    max="100"
+                    value={courseData.passingGrade} 
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Options</h3>
+              <div className="space-y-4">
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input 
@@ -192,6 +194,21 @@ const CourseSettings = () => {
                   <div className="ml-3 text-sm">
                     <label className="font-medium text-gray-700">Allow Late Submissions</label>
                     <p className="text-gray-500">Students can submit assignments after the due date</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="flex items-center h-5">
+                    <input 
+                      type="checkbox" 
+                      name="notifyOnSubmission"
+                      checked={courseData.notifyOnSubmission} 
+                      onChange={handleInputChange}
+                      className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label className="font-medium text-gray-700">Notify on Submission</label>
+                    <p className="text-gray-500">Receive notifications when students submit assignments</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -224,41 +241,32 @@ const CourseSettings = () => {
                     <p className="text-gray-500">Students can review each other's submissions</p>
                   </div>
                 </div>
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input 
-                      type="checkbox" 
-                      name="notifyOnSubmission"
-                      checked={courseData.notifyOnSubmission} 
-                      onChange={handleInputChange}
-                      className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label className="font-medium text-gray-700">Notify on Submission</label>
-                    <p className="text-gray-500">Receive notifications when students submit assignments</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         );
       case 'completion':
         return (
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Course Completion Requirements</h3>
-            <p className="text-sm text-gray-500 mb-6">
-              Define what students need to complete in order to finish the course.
-            </p>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Completion Requirements</h3>
+              <p className="text-sm text-gray-500 mb-6">Define what students need to complete in order to finish this course.</p>
             
-            <div className="overflow-hidden rounded-lg border border-gray-200">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requirement</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Required</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Minimum Count</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Minimum Score (%)</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Requirement
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Required
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Minimum Count
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Minimum Score (%)
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -310,8 +318,6 @@ const CourseSettings = () => {
             </div>
           </div>
         );
-      case 'language':
-        return <LanguageSettings />;
       default:
         return null;
     }
@@ -340,16 +346,6 @@ const CourseSettings = () => {
             }`}
           >
             Completion Requirements
-          </button>
-          <button
-            onClick={() => setActiveTab('language')}
-            className={`px-5 py-3 text-sm font-medium rounded-lg ${
-              activeTab === 'language'
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-            }`}
-          >
-            Language Settings
           </button>
         </div>
       </div>
