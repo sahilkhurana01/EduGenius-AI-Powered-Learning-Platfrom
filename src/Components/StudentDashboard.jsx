@@ -201,7 +201,6 @@ const StudentDashboard = () => {
             <Leaderboard 
               compact={false} 
               userData={userData}
-              key={userData.photoURL}
             />
           </div>
         );
