@@ -1,11 +1,13 @@
 {
   "name": "EduGenius - AI Powered Learning Platform",
   "short_name": "EduGenius",
-  "description": "Educational Platform",
-  "start_url": "/EduGenius-AI-Powered-Learning-Platfrom/",
-  "display": "standalone",
-  "background_color": "#ffffff",
+  "description": "Educational Platform powered by AI",
   "theme_color": "#4338CA",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/EduGenius-AI-Powered-Learning-Platfrom/",
+  "start_url": "/EduGenius-AI-Powered-Learning-Platfrom/",
   "icons": [
     {
       "src": "/EduGenius-AI-Powered-Learning-Platfrom/pwa1.png",
@@ -54,6 +56,27 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/EduGenius-AI-Powered-Learning-Platfrom/dashboard",
+      "icons": [{ "src": "/EduGenius-AI-Powered-Learning-Platfrom/pwa1.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Daily Quiz",
+      "url": "/EduGenius-AI-Powered-Learning-Platfrom/quiz",
+      "icons": [{ "src": "/EduGenius-AI-Powered-Learning-Platfrom/pwa1.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/EduGenius-AI-Powered-Learning-Platfrom/kid.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "EduGenius Learning Platform"
     }
   ]
 } 

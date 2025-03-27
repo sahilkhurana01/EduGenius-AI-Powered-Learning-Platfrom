@@ -1,4 +1,4 @@
-const CACHE_NAME = 'edugenius-v3';
+const CACHE_NAME = 'edugenius-cache-v1';
 const BASE_PATH = '/EduGenius-AI-Powered-Learning-Platfrom';
 const urlsToCache = [
   `${BASE_PATH}/`,

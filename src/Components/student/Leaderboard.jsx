@@ -10,15 +10,15 @@ const Leaderboard = ({ compact = true, userData }) => {
   
   // Mock data for fallback
   const mockData = [
-    { id: 1, name: 'Sarah Parker', score: 980, avatar: 'https://ui-avatars.com/api/?name=Sarah+Parker&background=ffdd00', class: 'Class 10th' },
-    { id: 3, name: 'Michael Chen', score: 920, avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=6366f1', class: 'Class 10th' },
-    { id: 4, name: 'Emma Wilson', score: 890, avatar: 'https://ui-avatars.com/api/?name=Emma+Wilson&background=ec4899', class: 'Class 10th' },
-    { id: 5, name: 'David Kim', score: 875, avatar: 'https://ui-avatars.com/api/?name=David+Kim&background=14b8a6', class: 'Class 10th' },
-    { id: 6, name: 'Jessica Lee', score: 865, avatar: 'https://ui-avatars.com/api/?name=Jessica+Lee&background=8b5cf6', class: 'Class 10th' },
-    { id: 7, name: 'Ryan Thompson', score: 855, avatar: 'https://ui-avatars.com/api/?name=Ryan+Thompson&background=f97316', class: 'Class 10th' },
-    { id: 8, name: 'Olivia Martinez', score: 840, avatar: 'https://ui-avatars.com/api/?name=Olivia+Martinez&background=6366f1', class: 'Class 10th' },
-    { id: 9, name: 'Ethan Brown', score: 830, avatar: 'https://ui-avatars.com/api/?name=Ethan+Brown&background=22c55e', class: 'Class 10th' },
-    { id: 10, name: 'Sophia Davis', score: 820, avatar: 'https://ui-avatars.com/api/?name=Sophia+Davis&background=ec4899', class: 'Class 10th' },
+    { id: 1, name: 'Sarah Parker', score: 980, avatar: 'https://randomuser.me/api/portraits/women/44.jpg', class: 'Class 10th' },
+    { id: 3, name: 'Michael Chen', score: 920, avatar: 'https://randomuser.me/api/portraits/men/67.jpg', class: 'Class 10th' },
+    { id: 4, name: 'Emma Wilson', score: 890, avatar: 'https://randomuser.me/api/portraits/women/63.jpg', class: 'Class 10th' },
+    { id: 5, name: 'David Kim', score: 875, avatar: 'https://randomuser.me/api/portraits/men/91.jpg', class: 'Class 10th' },
+    { id: 6, name: 'Jessica Lee', score: 865, avatar: 'https://randomuser.me/api/portraits/women/33.jpg', class: 'Class 10th' },
+    { id: 7, name: 'Ryan Thompson', score: 855, avatar: 'https://randomuser.me/api/portraits/men/41.jpg', class: 'Class 10th' },
+    { id: 8, name: 'Olivia Martinez', score: 840, avatar: 'https://randomuser.me/api/portraits/women/19.jpg', class: 'Class 10th' },
+    { id: 9, name: 'Ethan Brown', score: 830, avatar: 'https://randomuser.me/api/portraits/men/22.jpg', class: 'Class 10th' },
+    { id: 10, name: 'Sophia Davis', score: 820, avatar: 'https://randomuser.me/api/portraits/women/28.jpg', class: 'Class 10th' },
   ];
 
   // Get saved quiz score from localStorage
