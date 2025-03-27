@@ -74,13 +74,13 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Handle SPA routes - all routes should serve index.html
-  const url = new URL(event.request.url);
-  const pathSegments = url.pathname.split('/').filter(Boolean);
+  const requestUrl = new URL(event.request.url);
+  const pathSegments = requestUrl.pathname.split('/').filter(Boolean);
   
   // Check if it's an SPA route that needs to serve index.html
   if (
     pathSegments.length > 0 && 
-    !url.pathname.includes('.') && // Not a file with extension
+    !requestUrl.pathname.includes('.') && // Not a file with extension
     ['teacher-dashboard', 'student-dashboard', 'login', 'role-selection', 'ask-ai', 'dashboard', 'debug'].includes(pathSegments[pathSegments.length - 1])
   ) {
     event.respondWith(
