@@ -10,15 +10,15 @@ const Leaderboard = ({ compact = true, userData }) => {
   
   // Mock data for fallback
   const mockData = [
-    { id: 1, name: 'Sarah Parker', score: 980, avatar: 'https://randomuser.me/api/portraits/women/44.jpg', class: 'Class 10th' },
-    { id: 3, name: 'Michael Chen', score: 920, avatar: 'https://randomuser.me/api/portraits/men/67.jpg', class: 'Class 10th' },
-    { id: 4, name: 'Emma Wilson', score: 890, avatar: 'https://randomuser.me/api/portraits/women/63.jpg', class: 'Class 10th' },
-    { id: 5, name: 'David Kim', score: 875, avatar: 'https://randomuser.me/api/portraits/men/91.jpg', class: 'Class 10th' },
-    { id: 6, name: 'Jessica Lee', score: 865, avatar: 'https://randomuser.me/api/portraits/women/33.jpg', class: 'Class 10th' },
-    { id: 7, name: 'Ryan Thompson', score: 855, avatar: 'https://randomuser.me/api/portraits/men/41.jpg', class: 'Class 10th' },
-    { id: 8, name: 'Olivia Martinez', score: 840, avatar: 'https://randomuser.me/api/portraits/women/19.jpg', class: 'Class 10th' },
-    { id: 9, name: 'Ethan Brown', score: 830, avatar: 'https://randomuser.me/api/portraits/men/22.jpg', class: 'Class 10th' },
-    { id: 10, name: 'Sophia Davis', score: 820, avatar: 'https://randomuser.me/api/portraits/women/28.jpg', class: 'Class 10th' },
+    { id: 1, name: 'Sarah Parker', score: 980, avatar: 'https://ui-avatars.com/api/?name=Sarah+Parker&background=ffdd00', class: 'Class 10th' },
+    { id: 3, name: 'Michael Chen', score: 920, avatar: 'https://ui-avatars.com/api/?name=Michael+Chen&background=6366f1', class: 'Class 10th' },
+    { id: 4, name: 'Emma Wilson', score: 890, avatar: 'https://ui-avatars.com/api/?name=Emma+Wilson&background=ec4899', class: 'Class 10th' },
+    { id: 5, name: 'David Kim', score: 875, avatar: 'https://ui-avatars.com/api/?name=David+Kim&background=14b8a6', class: 'Class 10th' },
+    { id: 6, name: 'Jessica Lee', score: 865, avatar: 'https://ui-avatars.com/api/?name=Jessica+Lee&background=8b5cf6', class: 'Class 10th' },
+    { id: 7, name: 'Ryan Thompson', score: 855, avatar: 'https://ui-avatars.com/api/?name=Ryan+Thompson&background=f97316', class: 'Class 10th' },
+    { id: 8, name: 'Olivia Martinez', score: 840, avatar: 'https://ui-avatars.com/api/?name=Olivia+Martinez&background=6366f1', class: 'Class 10th' },
+    { id: 9, name: 'Ethan Brown', score: 830, avatar: 'https://ui-avatars.com/api/?name=Ethan+Brown&background=22c55e', class: 'Class 10th' },
+    { id: 10, name: 'Sophia Davis', score: 820, avatar: 'https://ui-avatars.com/api/?name=Sophia+Davis&background=ec4899', class: 'Class 10th' },
   ];
 
   // Get saved quiz score from localStorage
@@ -67,12 +67,7 @@ const Leaderboard = ({ compact = true, userData }) => {
   const fetchLeaderboardData = () => {
     setIsLoading(true);
     try {
-      // Check for Google profile picture directly
-      const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
-      console.log("Fetching leaderboard with Google photo URL:", googlePhotoURL);
-      
       // For now, we'll use mock data directly since the API isn't set up
-      // In a real app, you would make an API call here
       setTimeout(() => {
         arrangeLeaderboardWithCurrentUser(mockData);
         setError(null);
@@ -91,7 +86,6 @@ const Leaderboard = ({ compact = true, userData }) => {
     try {
       // Get Google profile picture directly (highest priority)
       const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
-      console.log("Arranging leaderboard with Google photo URL:", googlePhotoURL);
       
       // Use quiz scores from localStorage if available
       const userScore = localUserScore > 0 ? 945 + localUserScore : 945;
@@ -100,15 +94,23 @@ const Leaderboard = ({ compact = true, userData }) => {
       const currentUserData = {
         id: userData?.id || 'current-user',
         name: userData?.name || 'Alex Johnson',
+<<<<<<< HEAD
         score: userScore, // Updated to include quiz points
         avatar: googlePhotoURL || userData?.photoURL || 'https://randomuser.me/api/portraits/men/32.jpg', // Use Google photo first, then userData photoURL, then fallback
+=======
+        score: 945, // Fixed score for second position
+        avatar: googlePhotoURL || userData?.photoURL || 'https://ui-avatars.com/api/?name=You', 
+>>>>>>> 84ee053dd7afb4dbfc0baa3e24de21b401c5d6d8
         class: 'Class 10th',
         isCurrentUser: true
       };
       
+<<<<<<< HEAD
       console.log("Current user avatar set to:", currentUserData.avatar);
       console.log("Current user score set to:", currentUserData.score);
       
+=======
+>>>>>>> 84ee053dd7afb4dbfc0baa3e24de21b401c5d6d8
       if (!data || data.length === 0) {
         data = [...mockData]; // Ensure we have data
       }
@@ -130,10 +132,12 @@ const Leaderboard = ({ compact = true, userData }) => {
 
   // Fetch data when component mounts
   useEffect(() => {
-    console.log("Leaderboard received userData:", userData);
-    console.log("Google photo URL in sessionStorage:", sessionStorage.getItem('googlePhotoURL'));
-    fetchLeaderboardData();
-  }, [userData]); // Add userData as dependency to re-fetch when it changes
+    // Only fetch once on mount, or when userData significantly changes
+    if (isLoading || !leaderboardData.length) {
+      fetchLeaderboardData();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
 
   // Filter students based on search term
   const filteredStudents = leaderboardData
@@ -278,19 +282,19 @@ const Leaderboard = ({ compact = true, userData }) => {
       {/* Podium for top 3 students (only in full view) */}
       {!compact && displayStudents.length >= 3 && (
         <div className="relative flex justify-center items-end h-48 mb-12 px-8">
-          {/* Second place */}
+          {/* Second place - You */}
           <div className="w-1/4 z-10">
             <div className="flex flex-col items-center">
               <div className="relative mb-3">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-blue-300 shadow-lg">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-blue-300 shadow-lg bg-blue-50 relative">
                   <img 
-                    src={sessionStorage.getItem('googlePhotoURL') || displayStudents[1]?.avatar} 
+                    src={displayStudents[1]?.avatar} 
                     alt={displayStudents[1]?.name} 
                     className="h-full w-full object-cover"
                     referrerPolicy="no-referrer"
                     crossOrigin="anonymous"
                     onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(displayStudents[1]?.name || 'User');
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayStudents[1]?.name || 'User')}&background=3b82f6&color=fff`;
                     }}
                   />
                 </div>
@@ -316,11 +320,14 @@ const Leaderboard = ({ compact = true, userData }) => {
                 <div className="w-8 h-8 absolute -top-8 left-1/2 transform -translate-x-1/2 rotate-45 border-t-4 border-l-4 border-yellow-400"></div>
               </div>
               <div className="relative mb-3">
-                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-400 shadow-lg">
+                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-yellow-400 shadow-lg bg-yellow-50">
                   <img 
                     src={displayStudents[0]?.avatar} 
                     alt={displayStudents[0]?.name} 
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayStudents[0]?.name || 'First')}&background=f59e0b&color=fff`;
+                    }}
                   />
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-yellow-400 text-yellow-800 text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center shadow-md">
@@ -338,11 +345,14 @@ const Leaderboard = ({ compact = true, userData }) => {
           <div className="w-1/4 z-10">
             <div className="flex flex-col items-center">
               <div className="relative mb-3">
-                <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-amber-500 shadow-lg">
+                <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-amber-500 shadow-lg bg-amber-50">
                   <img 
                     src={displayStudents[2]?.avatar} 
                     alt={displayStudents[2]?.name} 
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayStudents[2]?.name || 'Third')}&background=d97706&color=fff`;
+                    }}
                   />
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-md">
@@ -367,7 +377,7 @@ const Leaderboard = ({ compact = true, userData }) => {
       )}
       
       {/* Leaderboard list */}
-      <div className={`${compact ? 'space-y-3' : 'space-y-3 bg-white rounded-lg shadow-md p-6'}`}>
+      <div className={`${compact ? 'space-y-3' : 'space-y-3 bg-white rounded-lg shadow-md p-6'} relative`}>
         {isLoading && displayStudents.length > 0 && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/70 z-10 rounded-lg">
             <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
@@ -388,7 +398,7 @@ const Leaderboard = ({ compact = true, userData }) => {
                 {getRankDisplay(position)}
               </div>
               
-              <div className={`h-10 w-10 rounded-full overflow-hidden relative ${compact ? 'ml-1' : 'ml-2'} ${isCurrentUser ? 'border-2 border-indigo-300' : ''}`}>
+              <div className={`h-10 w-10 rounded-full overflow-hidden relative ${compact ? 'ml-1' : 'ml-2'} ${isCurrentUser ? 'border-2 border-indigo-300' : ''} bg-indigo-50`}>
                 <img 
                   src={student.avatar} 
                   alt={student.name} 
@@ -397,6 +407,12 @@ const Leaderboard = ({ compact = true, userData }) => {
                     referrerPolicy: "no-referrer",
                     crossOrigin: "anonymous"
                   } : {})}
+                  onError={(e) => {
+                    // Generate a colored avatar based on name
+                    const colors = ['3b82f6', '8b5cf6', 'ec4899', 'f97316', '22c55e', '14b8a6'];
+                    const colorIndex = student.id % colors.length;
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(student.name || 'User')}&background=${colors[colorIndex]}&color=fff`;
+                  }}
                 />
               </div>
               
