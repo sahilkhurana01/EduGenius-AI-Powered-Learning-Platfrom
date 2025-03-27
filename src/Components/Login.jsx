@@ -12,7 +12,7 @@ import {
     updateProfile
 } from "firebase/auth";
 import { saveProfilePicture, clearProfilePictureData } from '../utils/ProfilePictureManager';
-
+import { useAuth } from '../hooks/useAuth.jsx';
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -25,9 +25,24 @@ const AuthPage = () => {
     const [animating, setAnimating] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
 
     // Get user role from session storage
     const userRole = sessionStorage.getItem('userRole') || 'student';
+
+    // Check if user is already authenticated and redirect
+    useEffect(() => {
+        if (isAuthenticated) {
+            // Redirect to appropriate dashboard based on role
+            if (userRole === 'teacher') {
+                navigate('/teacher-dashboard');
+            } else if (userRole === 'student') {
+                navigate('/student-dashboard');
+            } else {
+                navigate('/role-selection');
+            }
+        }
+    }, [isAuthenticated, navigate, userRole]);
 
     // Check if device is mobile on mount and window resize
     useEffect(() => {
@@ -85,11 +100,17 @@ const AuthPage = () => {
         sessionStorage.setItem('isAuthenticated', 'true');
         sessionStorage.setItem('userEmail', user.email);
         
+        // Store authentication status in localStorage for persistence
+        localStorage.setItem('userAuthenticated', 'true');
+        localStorage.setItem('userEmail', user.email);
+        
         // Set user name with preference for display name, fallback to email prefix
         const userName = user.displayName || user.email.split('@')[0];
         sessionStorage.setItem('userName', userName);
+        localStorage.setItem('userName', userName);
         
         sessionStorage.setItem('userId', user.uid);
+        localStorage.setItem('userId', user.uid);
         
         // Store the user's profile picture if available
         if (user.photoURL) {
@@ -98,12 +119,13 @@ const AuthPage = () => {
             const isGooglePhoto = user.photoURL.includes('googleusercontent.com');
             // Set the Google photo URL with priority
             sessionStorage.setItem('googlePhotoURL', user.photoURL);
+            localStorage.setItem('googlePhotoURL', user.photoURL);
             // Also use our profile picture manager to ensure it's stored properly
             const userRole = sessionStorage.getItem('userRole') || 'student';
             saveProfilePicture(user.photoURL, userRole, isGooglePhoto);
         }
         
-        console.log('All session storage data set:', {
+        console.log('All storage data set for persistent login:', {
             isAuthenticated: true,
             userEmail: user.email,
             userName,
@@ -117,23 +139,26 @@ const AuthPage = () => {
         // If no role is set, default to student and go to role selection
         if (!userRole) {
             console.log('No user role found, redirecting to role selection');
-            navigate('/role-selection');
+            navigate('/role-selection', { replace: true });
             return;
         }
+        
+        // Store the role in localStorage for persistence
+        localStorage.setItem('userRole', userRole);
         
         console.log(`User authenticated with role: ${userRole}`);
         
         // Navigate based on user role - ensure we're using the correct paths
         if (userRole === 'teacher') {
             console.log('Navigating to teacher dashboard');
-            navigate('/teacher-dashboard');
+            navigate('/teacher-dashboard', { replace: true });
         } else if (userRole === 'student') {
             console.log('Navigating to student dashboard');
-            navigate('/student-dashboard');
+            navigate('/student-dashboard', { replace: true });
         } else {
             // Unknown role, redirect to role selection
             console.log('Unknown role, redirecting to role selection');
-            navigate('/role-selection');
+            navigate('/role-selection', { replace: true });
         }
     };
 

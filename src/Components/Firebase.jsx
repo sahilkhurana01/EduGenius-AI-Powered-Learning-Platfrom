@@ -17,5 +17,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth();
+// Get auth instance - persistence will be set in the useAuth hook
+const auth = getAuth();
+
+export { auth };
 export default app;

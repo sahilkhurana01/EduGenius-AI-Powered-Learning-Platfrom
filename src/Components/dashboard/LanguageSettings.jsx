@@ -16,6 +16,9 @@ const LanguageSettings = () => {
     resetOnLogout: true 
   });
   const [saveStatus, setSaveStatus] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredLanguages, setFilteredLanguages] = useState(supportedLanguages);
+  
   // Track if Google Translate is blocked
   const [isTranslateBlocked, setIsTranslateBlocked] = useState(
     sessionStorage.getItem('google_translate_blocked') === 'true'
@@ -43,6 +46,18 @@ const LanguageSettings = () => {
       );
     }
   }, []);
+
+  // Filter languages when search term changes
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredLanguages(supportedLanguages);
+    } else {
+      const filtered = supportedLanguages.filter(language => 
+        language.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredLanguages(filtered);
+    }
+  }, [searchTerm]);
 
   // Handle language change in dropdown (just updates the UI, doesn't apply yet)
   const handleLanguageChange = (event) => {
@@ -127,64 +142,82 @@ const LanguageSettings = () => {
           <label htmlFor="language-select" className="block text-sm font-medium text-gray-700 mb-2" data-translatable="Select Interface Language">
             {getTranslatedText('Select Interface Language')}
           </label>
-          <select
-            id="language-select"
-            value={selectedLanguage}
-            onChange={handleLanguageChange}
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          >
-            {supportedLanguages.map((language) => (
-              <option key={language.code} value={language.code}>
-                {language.name}
-              </option>
-            ))}
-          </select>
+          
+          {/* Search input for languages */}
+          <div className="mb-3">
+            <input
+              type="text"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              placeholder="Search languages..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <div className="relative">
+            <select
+              id="language-select"
+              value={selectedLanguage}
+              onChange={handleLanguageChange}
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              style={{maxHeight: '300px'}}
+            >
+              {filteredLanguages.map((language) => (
+                <option key={language.code} value={language.code}>
+                  {language.name}
+                </option>
+              ))}
+            </select>
+            {filteredLanguages.length === 0 && (
+              <div className="text-sm text-gray-500 mt-1">
+                No languages match your search.
+              </div>
+            )}
+          </div>
+          
           <p className="mt-2 text-sm text-gray-500" data-translatable="This will change the language">
             {getTranslatedText('This will change the language of the entire interface using Google Translate.')}
           </p>
         </div>
         
-        <div className="flex items-start mb-6">
-          <div className="flex items-center h-5">
+        <div className="mb-6">
+          <div className="flex items-center">
             <input
               id="reset-on-logout"
-              name="reset-on-logout"
               type="checkbox"
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               checked={resetOnLogout}
               onChange={handleResetToggle}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
             />
-          </div>
-          <div className="ml-3 text-sm">
-            <label htmlFor="reset-on-logout" className="font-medium text-gray-700" data-translatable="Reset to English">
+            <label htmlFor="reset-on-logout" className="ml-2 block text-sm text-gray-700" data-translatable="Reset to English">
               {getTranslatedText('Reset to English on logout')}
             </label>
-            <p className="text-gray-500" data-translatable="When you log out">
-              {getTranslatedText('When you log out, the language will be reset to English for the next user.')}
-            </p>
           </div>
+          <p className="mt-1 text-sm text-gray-500" data-translatable="When you log out">
+            {getTranslatedText('When you log out, the language will be reset to English for the next user.')}
+          </p>
         </div>
-
-        {saveStatus && (
-          <div className={`p-3 mb-4 rounded ${saveStatus.includes('success') || saveStatus.includes('successfully') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-            {saveStatus}
-          </div>
-        )}
-      </div>
-      
-      <div className="bg-gray-50 px-6 py-4 flex justify-end border-t border-gray-100">
-        <button
-          onClick={handleSaveChanges}
-          disabled={!hasChanges}
-          className={`px-4 py-2 rounded-md text-sm font-medium ${
-            hasChanges
-              ? 'bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
-          data-translatable="Save Changes"
-        >
-          {getTranslatedText('Save Changes')}
-        </button>
+        
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={handleSaveChanges}
+            disabled={!hasChanges}
+            className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+              hasChanges 
+                ? 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' 
+                : 'bg-gray-300 cursor-not-allowed'
+            }`}
+          >
+            {getTranslatedText('Save Changes')}
+          </button>
+          
+          {saveStatus && (
+            <span className={`ml-3 text-sm ${saveStatus.includes('Failed') ? 'text-red-600' : 'text-green-600'}`}>
+              {saveStatus}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

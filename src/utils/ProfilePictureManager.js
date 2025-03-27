@@ -305,28 +305,46 @@ export const clearProfilePictureData = () => {
  * Handle logout by clearing session data
  * @param {function} navigate - React Router navigate function
  */
-export const handleLogout = (navigate) => {
-  // Clear session storage
-  sessionStorage.removeItem('isAuthenticated');
-  sessionStorage.removeItem('userRole');
-  sessionStorage.removeItem('userName');
-  sessionStorage.removeItem('userEmail');
-  sessionStorage.removeItem('userPhotoURL');
-  sessionStorage.removeItem('googlePhotoURL');
-  sessionStorage.removeItem('originalGooglePhotoURL');
-  sessionStorage.removeItem('userId');
-  
-  // Clear profile picture cache
-  clearProfilePictureData();
-  
-  // Reset language to default (English)
-  clearLanguagePreference();
-  
-  // Redirect to login page
-  if (navigate) {
-    navigate('/login');
-  } else {
-    window.location.href = '/login';
+export const handleLogout = async (navigate) => {
+  try {
+    // Import the auth module dynamically to avoid circular dependencies
+    const { auth } = await import('../Components/Firebase');
+    const { signOut } = await import('firebase/auth');
+    
+    // Sign out from Firebase
+    await signOut(auth);
+    
+    // Clear all storage
+    sessionStorage.clear();
+    localStorage.removeItem('userAuthenticated');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('googlePhotoURL');
+    
+    // Clear profile picture cache
+    clearProfilePictureData();
+    
+    // Reset language to default (English)
+    clearLanguagePreference();
+    
+    // Redirect to login page
+    if (navigate) {
+      navigate('/login', { replace: true });
+    } else {
+      window.location.href = import.meta.env.BASE_URL + 'login';
+    }
+    console.log('User logged out successfully');
+  } catch (error) {
+    console.error('Error during logout:', error);
+    // Fallback to basic logout if something fails
+    sessionStorage.clear();
+    localStorage.clear();
+    if (navigate) {
+      navigate('/login', { replace: true });
+    } else {
+      window.location.href = import.meta.env.BASE_URL + 'login';
+    }
   }
-  console.log('User logged out successfully');
 }; 

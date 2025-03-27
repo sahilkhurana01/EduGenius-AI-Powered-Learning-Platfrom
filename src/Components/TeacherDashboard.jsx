@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { preloadProfilePicture, handleProfilePictureError, handleLogout } from '../utils/ProfilePictureManager';
-import { initializeGoogleTranslate, supportedLanguages, getCurrentLanguage, applyGoogleTranslate } from '../utils/LanguageService';
+import { initializeGoogleTranslate, supportedLanguages, getCurrentLanguage, applyGoogleTranslate, isGoogleTranslateReady, removeTranslateBar } from '../utils/LanguageService';
 import RecentActivity from './dashboard/RecentActivity';
 import ResourceLibrary from './dashboard/ResourceLibrary';
 import StudentProgress from './dashboard/StudentProgress';
@@ -14,6 +14,7 @@ import WeeklyActivity from './dashboard/WeeklyActivity';
 import CourseSettings from './dashboard/CourseSettings';
 import HelpSupport from './dashboard/HelpSupport';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import LanguageDropdown from '../components/LanguageDropdown.jsx';
 
 const TeacherDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -30,12 +31,16 @@ const TeacherDashboard = () => {
   const languageDropdownRef = useRef(null);
   const navigate = useNavigate();
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   // Check if user is authenticated and is a teacher
   useEffect(() => {
-    const userRole = sessionStorage.getItem('userRole');
-    const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+    // Check if user is authenticated
+    const userAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
     
-    if (!isAuthenticated || userRole !== 'teacher') {
+    if (!userAuthenticated) {
       navigate('/login');
     } else {
       // Fetch user data from session storage if available
@@ -53,7 +58,42 @@ const TeacherDashboard = () => {
       loadProfilePicture();
       
       // Initialize Google Translate
-      initializeGoogleTranslate();
+      const loadTranslate = async () => {
+        try {
+          // Check if already loaded
+          if (!isGoogleTranslateReady()) {
+            console.log('Google Translate not ready, initializing...');
+            await initializeGoogleTranslate();
+            
+            // Apply saved language when Google Translate becomes ready
+            const handleTranslateReady = () => {
+              const savedLanguage = getCurrentLanguage();
+              if (savedLanguage && savedLanguage !== 'en') {
+                applyGoogleTranslate(savedLanguage);
+                setCurrentLanguage(savedLanguage);
+                // Remove the translate bar after translation
+                removeTranslateBar();
+              }
+            };
+            
+            window.addEventListener('google-translate-ready', handleTranslateReady, { once: true });
+          } else {
+            console.log('Google Translate already loaded');
+            // Apply saved language immediately since Google Translate is ready
+            const savedLanguage = getCurrentLanguage();
+            if (savedLanguage && savedLanguage !== 'en') {
+              applyGoogleTranslate(savedLanguage);
+              setCurrentLanguage(savedLanguage);
+              // Remove the translate bar after translation
+              removeTranslateBar();
+            }
+          }
+        } catch (error) {
+          console.error('Error initializing Google Translate:', error);
+        }
+      };
+      
+      loadTranslate();
     }
   }, [navigate]);
 
@@ -115,10 +155,6 @@ const TeacherDashboard = () => {
     } finally {
       setProfilePictureLoading(false);
     }
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
   };
 
   // Use our new logout handler
@@ -244,46 +280,14 @@ const TeacherDashboard = () => {
           </button>
           
           <div className="flex items-center space-x-4">
-            {/* Language Dropdown */}
-            <div className="relative" ref={languageDropdownRef}>
-              <button 
-                onClick={toggleLanguageMenu}
-                className="relative flex items-center text-gray-600 hover:text-indigo-600 transition-colors duration-150 focus:outline-none"
-                title="Language Settings"
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-                </svg>
-                <span className="ml-1 text-xs font-medium">{currentLanguage.toUpperCase()}</span>
-              </button>
-              
-              {languageMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-20 py-1">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">Select Language</p>
-                  </div>
-                  <div className="max-h-60 overflow-y-auto">
-                    {supportedLanguages.map((language) => (
-                      <button
-                        key={language.code}
-                        onClick={() => handleLanguageChange(language.code)}
-                        className={`w-full text-left block px-4 py-2 text-sm hover:bg-indigo-50 ${
-                          currentLanguage === language.code ? 'bg-indigo-50 text-indigo-600 font-medium' : 'text-gray-700'
-                        }`}
-                      >
-                        {language.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Language Dropdown - Updated to use new component */}
+            <LanguageDropdown />
             
             <button className="text-indigo-600 hover:text-indigo-800 relative transition-colors duration-150">
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
               </svg>
-              <span className="absolute -top-1 -right-1 bg-yellow-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">3</span>
+              <span className="absolute -top-1 -right-1 bg-yellow-500 text-white rounded-full text-xs w-4 h-4 flex items-center justify-center">2</span>
             </button>
             
             {/* Profile section with improved cursor and loading */}
