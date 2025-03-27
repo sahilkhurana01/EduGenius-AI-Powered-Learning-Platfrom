@@ -198,12 +198,65 @@ const StudentDashboard = () => {
         return (
           <div className="space-y-6">
             <StatCards stats={dashboardStats} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <RecentActivity />
-              <WeeklyActivity />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-sm">
+                <h2 className="text-lg font-medium text-indigo-800 mb-4">My Learning Progress</h2>
+                <div className="flex flex-col space-y-4">
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-700">Mathematics - Algebra</span>
+                    <span className="text-sm font-medium text-indigo-600">85%</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full">
+                    <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '85%' }}></div>
+                  </div>
+                  
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-700">Physics - Mechanics</span>
+                    <span className="text-sm font-medium text-indigo-600">62%</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full">
+                    <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '62%' }}></div>
+                  </div>
+                  
+                  <div className="flex justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-700">Literature - Modern Fiction</span>
+                    <span className="text-sm font-medium text-indigo-600">78%</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full">
+                    <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '78%' }}></div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h2 className="text-lg font-medium text-indigo-800 mb-4">Recent Activity</h2>
+                <RecentActivity />
+              </div>
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h2 className="text-lg font-medium text-indigo-800 mb-4">My Courses</h2>
+                <MyCourses />
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
+                <ResourceLibrary userRole="student" />
+              </div>
+            </div>
+          </div>
+        );
+      case 'courses':
+        return (
+          <div className="transition-opacity duration-300">
             <MyCourses />
-            <ResourceLibrary />
+          </div>
+        );
+      case 'resources':
+        return (
+          <div className="transition-opacity duration-300">
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
+              <ResourceLibrary userRole="student" />
+            </div>
           </div>
         );
       case 'messages':
@@ -377,103 +430,6 @@ const StudentDashboard = () => {
           </div>
           
           {renderContent()}
-
-          {/* Dashboard View */}
-          {activeTab === 'dashboard' && (
-            <div className="space-y-6">
-              <StatCards stats={dashboardStats} />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-2 bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-lg font-medium text-indigo-800 mb-4">My Learning Progress</h2>
-                  <div className="flex flex-col space-y-4">
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">Mathematics - Algebra</span>
-                      <span className="text-sm font-medium text-indigo-600">85%</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '85%' }}></div>
-                    </div>
-                    
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">Physics - Mechanics</span>
-                      <span className="text-sm font-medium text-indigo-600">62%</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '62%' }}></div>
-                    </div>
-                    
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-700">Literature - Modern Fiction</span>
-                      <span className="text-sm font-medium text-indigo-600">78%</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full">
-                      <div className="h-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full" style={{ width: '78%' }}></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Recent Activity</h2>
-                  <RecentActivity />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-lg font-medium text-indigo-800 mb-4">My Courses</h2>
-                  <MyCourses />
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
-                  <ResourceLibrary userRole="student" />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Lessons Tab */}
-          {activeTab === 'courses' && (
-            <div className="transition-opacity duration-300">
-              <MyCourses />
-            </div>
-          )}
-
-          {/* Resources Tab */}
-          {activeTab === 'resources' && (
-            <div className="transition-opacity duration-300">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
-                <ResourceLibrary userRole="student" />
-              </div>
-            </div>
-          )}
-
-          {/* Calendar Tab */}
-          {activeTab === 'calendar' && (
-            <div className="transition-opacity duration-300">
-              <CalendarTab />
-            </div>
-          )}
-
-          {/* Messages Tab */}
-          {activeTab === 'messages' && (
-            <div className="transition-opacity duration-300">
-              <MessagesTab />
-            </div>
-          )}
-
-          {/* Help & Support Tab */}
-          {activeTab === 'help' && (
-            <div className="transition-opacity duration-300">
-              <HelpSupport />
-            </div>
-          )}
-
-          {/* Settings Tab */}
-          {activeTab === 'settings' && (
-            <div className="transition-opacity duration-300">
-              <CourseSettings />
-            </div>
-          )}
-
         </main>
       </div>
     </div>

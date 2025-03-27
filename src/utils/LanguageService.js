@@ -388,8 +388,8 @@ export const initializeGoogleTranslate = async () => {
       isGoogleTranslateLoading = true;
       
       // Try to load Google Translate
-      if (typeof window.loadGoogleTranslate === 'function') {
-        window.loadGoogleTranslate();
+    if (typeof window.loadGoogleTranslate === 'function') {
+      window.loadGoogleTranslate();
         
         // Wait for it to load
         const loaded = await waitForGoogleTranslate(5000);
@@ -478,9 +478,9 @@ export const applyGoogleTranslate = (langCode) => {
           window.history.replaceState({}, document.title, url);
           window.location.reload();
           return;
-        }
-      } catch (e) {
-        console.warn('Could not reset translation:', e);
+          }
+        } catch (e) {
+          console.warn('Could not reset translation:', e);
       }
       return;
     }
@@ -504,17 +504,17 @@ export const applyGoogleTranslate = (langCode) => {
     // Safely try to find and use the dropdown
     try {
       // First try: Find the language selector dropdown
-      const selectElement = document.querySelector('.goog-te-combo');
+    const selectElement = document.querySelector('.goog-te-combo');
       
-      if (selectElement) {
-        selectElement.value = langCode;
-        selectElement.dispatchEvent(new Event('change'));
+    if (selectElement) {
+      selectElement.value = langCode;
+      selectElement.dispatchEvent(new Event('change'));
         
         // Remove translate bar after translation is applied
         setTimeout(removeTranslateBar, 1000);
-        return;
-      }
-      
+      return;
+    }
+    
       // Second try: Look for Google Translate directly in iframes or other elements
       try {
         const frame = document.querySelector('.goog-te-menu-frame');
