@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['pwalogo.png', 'kid.jpg', 'edugenius logo.png'],
+      includeAssets: ['pwa1.png', 'kid.jpg', 'edugenius logo.png'],
       manifest: {
         name: 'EduGenius - AI Powered Learning Platform',
         short_name: 'EduGenius',
@@ -19,7 +19,7 @@ export default defineConfig({
         theme_color: '#4338CA',
         icons: [
           {
-            src: 'pwalogo.png',
+            src: 'pwa1.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
@@ -60,7 +60,18 @@ export default defineConfig({
       }
     })
   ],
-  base: "/EduGenius-AI-Powered-Learning-Platfrom",
+  base: "/EduGenius-AI-Powered-Learning-Platfrom/",
+  server: {
+    hmr: {
+      host: 'localhost',
+      protocol: 'ws'
+    },
+    // Handle SPA routing in development
+    historyApiFallback: {
+      disableDotRule: true,
+      index: '/EduGenius-AI-Powered-Learning-Platfrom/'
+    }
+  },
   resolve: {
     alias: {
       // Add the same path aliases used in teaDash

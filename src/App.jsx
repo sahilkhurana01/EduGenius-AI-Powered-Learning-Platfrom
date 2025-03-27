@@ -11,6 +11,9 @@ import LandingPage from './Components/LandingPage/LandingPage';
 import Loading from './Components/Loading';
 import PWAInstallPrompt from './Components/PWAInstallPrompt';
 
+// Get base URL from Vite environment
+const BASE_URL = import.meta.env.BASE_URL || '/';
+
 // Role-based Auth Guard component for protected routes
 const ProtectedRoute = ({ element, allowedRole }) => {
   const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
@@ -83,14 +86,14 @@ function App() {
       {/* Hidden Google Translate element */}
       <div id="google_translate_element" style={{ display: 'none' }}></div>
       
-      {/* PWA Install Prompt */}
+      {/* PWA Install Prompt - Direct render */}
       <PWAInstallPrompt />
       
       <AnimatePresence mode="wait" initial={true}>
         {loading ? (
           <Loading key="loading" />
         ) : (
-          <Router key="router">
+          <Router basename={BASE_URL} key="router">
             <Routes>
               {/* Default route is now the LandingPage */}
               <Route path="/" element={<LandingPage />} />

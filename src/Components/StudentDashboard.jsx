@@ -432,7 +432,7 @@ const StudentDashboard = () => {
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-sm">
                   <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
-                  <ResourceLibrary />
+                  <ResourceLibrary userRole="student" />
                 </div>
               </div>
             </div>
@@ -448,7 +448,10 @@ const StudentDashboard = () => {
           {/* Resources Tab */}
           {activeTab === 'resources' && (
             <div className="transition-opacity duration-300">
-              <ResourceLibrary />
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
+                <ResourceLibrary userRole="student" />
+              </div>
             </div>
           )}
 

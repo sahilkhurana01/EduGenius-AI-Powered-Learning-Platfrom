@@ -1,32 +1,43 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
 
-const PWAInstallPrompt = () => {
-  const [installPrompt, setInstallPrompt] = useState(null);
-  const [isVisible, setIsVisible] = useState(false);
+class PWAInstallPrompt extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      installPrompt: null,
+      isVisible: false
+    };
+  }
 
-  useEffect(() => {
+  componentDidMount() {
     const handleBeforeInstallPrompt = (e) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later
-      setInstallPrompt(e);
-      // Show the install prompt
-      setIsVisible(true);
+      this.setState({ 
+        installPrompt: e,
+        isVisible: true
+      });
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     // Check if PWA is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsVisible(false);
+      this.setState({ isVisible: false });
     }
 
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
+    // Store the event listener reference for cleanup
+    this.beforeInstallPromptHandler = handleBeforeInstallPrompt;
+  }
 
-  const handleInstallClick = () => {
+  componentWillUnmount() {
+    // Clean up the event listener when component is unmounted
+    window.removeEventListener('beforeinstallprompt', this.beforeInstallPromptHandler);
+  }
+
+  handleInstallClick = () => {
+    const { installPrompt } = this.state;
     if (!installPrompt) return;
 
     // Show the install prompt
@@ -40,35 +51,41 @@ const PWAInstallPrompt = () => {
         console.log('User dismissed the PWA installation');
       }
       // Clear the saved prompt since it can't be used again
-      setInstallPrompt(null);
-      setIsVisible(false);
+      this.setState({
+        installPrompt: null,
+        isVisible: false
+      });
     });
   };
 
-  if (!isVisible) return null;
+  render() {
+    const { isVisible } = this.state;
 
-  return (
-    <div className="fixed bottom-4 left-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg z-50 max-w-md mx-auto flex items-center justify-between">
-      <div>
-        <h3 className="font-semibold text-gray-900 dark:text-white">Install EduGenius</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">Install our app for a better experience</p>
+    if (!isVisible) return null;
+
+    return (
+      <div className="fixed bottom-4 left-4 right-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg z-50 max-w-md mx-auto flex items-center justify-between">
+        <div>
+          <h3 className="font-semibold text-gray-900 dark:text-white">Install EduGenius</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Install our app for a better experience</p>
+        </div>
+        <div className="flex space-x-2">
+          <button 
+            onClick={() => this.setState({ isVisible: false })}
+            className="px-3 py-1.5 text-sm rounded-md text-gray-700 dark:text-gray-200"
+          >
+            Later
+          </button>
+          <button 
+            onClick={this.handleInstallClick}
+            className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            Install
+          </button>
+        </div>
       </div>
-      <div className="flex space-x-2">
-        <button 
-          onClick={() => setIsVisible(false)}
-          className="px-3 py-1.5 text-sm rounded-md text-gray-700 dark:text-gray-200"
-        >
-          Later
-        </button>
-        <button 
-          onClick={handleInstallClick}
-          className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-        >
-          Install
-        </button>
-      </div>
-    </div>
-  );
-};
+    );
+  }
+}
 
 export default PWAInstallPrompt; 

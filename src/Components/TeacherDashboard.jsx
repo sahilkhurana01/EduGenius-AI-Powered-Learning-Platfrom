@@ -364,7 +364,7 @@ const TeacherDashboard = () => {
                 </div>
                 <div className="bg-white p-6 rounded-lg shadow-sm">
                   <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
-                  <ResourceLibrary />
+                  <ResourceLibrary userRole="teacher" />
                 </div>
               </div>
             </div>
@@ -372,7 +372,14 @@ const TeacherDashboard = () => {
           
           {activeTab === 'students' && <StudentsTab />}
           {activeTab === 'lessons' && <LessonsTab />}
-          {activeTab === 'resources' && <ResourceLibrary />}
+          {activeTab === 'resources' && (
+            <div className="transition-opacity duration-300">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <h2 className="text-lg font-medium text-indigo-800 mb-4">Resource Library</h2>
+                <ResourceLibrary userRole="teacher" />
+              </div>
+            </div>
+          )}
           {activeTab === 'calendar' && <CalendarTab />}
           {activeTab === 'messages' && <MessagesTab />}
           {activeTab === 'settings' && <CourseSettings />}

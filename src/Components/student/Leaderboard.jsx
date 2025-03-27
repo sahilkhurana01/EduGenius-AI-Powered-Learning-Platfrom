@@ -6,6 +6,7 @@ const Leaderboard = ({ compact = true, userData }) => {
   const [leaderboardData, setLeaderboardData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [localUserScore, setLocalUserScore] = useState(0);
   
   // Mock data for fallback
   const mockData = [
@@ -19,6 +20,48 @@ const Leaderboard = ({ compact = true, userData }) => {
     { id: 9, name: 'Ethan Brown', score: 830, avatar: 'https://randomuser.me/api/portraits/men/22.jpg', class: 'Class 10th' },
     { id: 10, name: 'Sophia Davis', score: 820, avatar: 'https://randomuser.me/api/portraits/women/28.jpg', class: 'Class 10th' },
   ];
+
+  // Get saved quiz score from localStorage
+  useEffect(() => {
+    const checkLocalStorageScore = () => {
+      try {
+        // Get quiz score data
+        const quizData = JSON.parse(localStorage.getItem('leaderboardData') || '{}');
+        const localScore = quizData.score || 0;
+        setLocalUserScore(localScore);
+        
+        // Update the score every time localStorage changes
+        const handleStorageChange = () => {
+          const updatedData = JSON.parse(localStorage.getItem('leaderboardData') || '{}');
+          setLocalUserScore(updatedData.score || 0);
+          fetchLeaderboardData(); // Refresh leaderboard with new scores
+        };
+        
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+      } catch (err) {
+        console.error('Error reading local storage data:', err);
+      }
+    };
+    
+    checkLocalStorageScore();
+    
+    // Check for changes every 5 seconds (as localStorage doesn't trigger events on the same page)
+    const intervalId = setInterval(() => {
+      try {
+        const quizData = JSON.parse(localStorage.getItem('leaderboardData') || '{}');
+        const localScore = quizData.score || 0;
+        if (localScore !== localUserScore) {
+          setLocalUserScore(localScore);
+          fetchLeaderboardData(); // Refresh leaderboard
+        }
+      } catch (err) {
+        console.error('Error checking score updates:', err);
+      }
+    }, 5000);
+    
+    return () => clearInterval(intervalId);
+  }, [localUserScore]);
 
   // Fetch leaderboard data
   const fetchLeaderboardData = () => {
@@ -50,17 +93,21 @@ const Leaderboard = ({ compact = true, userData }) => {
       const googlePhotoURL = sessionStorage.getItem('googlePhotoURL');
       console.log("Arranging leaderboard with Google photo URL:", googlePhotoURL);
       
+      // Use quiz scores from localStorage if available
+      const userScore = localUserScore > 0 ? 945 + localUserScore : 945;
+      
       // Create current user object based on userData from StudentDashboard
       const currentUserData = {
         id: userData?.id || 'current-user',
         name: userData?.name || 'Alex Johnson',
-        score: 945, // Fixed score for second position
+        score: userScore, // Updated to include quiz points
         avatar: googlePhotoURL || userData?.photoURL || 'https://randomuser.me/api/portraits/men/32.jpg', // Use Google photo first, then userData photoURL, then fallback
         class: 'Class 10th',
         isCurrentUser: true
       };
       
       console.log("Current user avatar set to:", currentUserData.avatar);
+      console.log("Current user score set to:", currentUserData.score);
       
       if (!data || data.length === 0) {
         data = [...mockData]; // Ensure we have data
