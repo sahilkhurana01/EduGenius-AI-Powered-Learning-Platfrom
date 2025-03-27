@@ -94,23 +94,15 @@ const Leaderboard = ({ compact = true, userData }) => {
       const currentUserData = {
         id: userData?.id || 'current-user',
         name: userData?.name || 'Alex Johnson',
-<<<<<<< HEAD
         score: userScore, // Updated to include quiz points
         avatar: googlePhotoURL || userData?.photoURL || 'https://randomuser.me/api/portraits/men/32.jpg', // Use Google photo first, then userData photoURL, then fallback
-=======
-        score: 945, // Fixed score for second position
-        avatar: googlePhotoURL || userData?.photoURL || 'https://ui-avatars.com/api/?name=You', 
->>>>>>> 84ee053dd7afb4dbfc0baa3e24de21b401c5d6d8
         class: 'Class 10th',
         isCurrentUser: true
       };
       
-<<<<<<< HEAD
       console.log("Current user avatar set to:", currentUserData.avatar);
       console.log("Current user score set to:", currentUserData.score);
       
-=======
->>>>>>> 84ee053dd7afb4dbfc0baa3e24de21b401c5d6d8
       if (!data || data.length === 0) {
         data = [...mockData]; // Ensure we have data
       }
