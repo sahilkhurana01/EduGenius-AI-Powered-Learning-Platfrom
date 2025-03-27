@@ -3,7 +3,7 @@ const BASE_PATH = '/EduGenius-AI-Powered-Learning-Platfrom';
 const urlsToCache = [
   `${BASE_PATH}/`,
   `${BASE_PATH}/index.html`,
-  `${BASE_PATH}/pwalogo.png`,
+  `${BASE_PATH}/pwa1.png`,
   `${BASE_PATH}/manifest.json`,
   `${BASE_PATH}/kid.jpg`,
   `${BASE_PATH}/edugenius logo.png`
@@ -41,6 +41,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Fix for double path issue
+  let url = new URL(event.request.url);
+  if (url.pathname.includes(`${BASE_PATH}${BASE_PATH}`)) {
+    url.pathname = url.pathname.replace(`${BASE_PATH}${BASE_PATH}`, BASE_PATH);
+    event.respondWith(fetch(new Request(url, event.request)));
+    return;
+  }
+
   console.log('[ServiceWorker] Fetch', event.request.url);
 
   // For navigate requests (HTML), use network-first strategy
@@ -60,6 +68,25 @@ self.addEventListener('fetch', (event) => {
               // If navigate request fails and isn't in cache, serve the index page
               return caches.match(`${BASE_PATH}/`);
             });
+        })
+    );
+    return;
+  }
+
+  // Handle SPA routes - all routes should serve index.html
+  const url = new URL(event.request.url);
+  const pathSegments = url.pathname.split('/').filter(Boolean);
+  
+  // Check if it's an SPA route that needs to serve index.html
+  if (
+    pathSegments.length > 0 && 
+    !url.pathname.includes('.') && // Not a file with extension
+    ['teacher-dashboard', 'student-dashboard', 'login', 'role-selection', 'ask-ai', 'dashboard', 'debug'].includes(pathSegments[pathSegments.length - 1])
+  ) {
+    event.respondWith(
+      caches.match(`${BASE_PATH}/`) // Serve the index.html for SPA routes
+        .then(response => {
+          return response || fetch(`${BASE_PATH}/`);
         })
     );
     return;
